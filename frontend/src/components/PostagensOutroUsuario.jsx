@@ -31,7 +31,7 @@ function PostagensOutroUsuario({ outroUsuario }) {
 
     try {
       const result = await fetch(
-        "http://localhost:5000/conexao/enviarSolicitacao",
+        "https://link-us-virid.vercel.app/_/backend/conexao/enviarSolicitacao",
         {
           method: "POST",
           body: JSON.stringify(data),
@@ -61,7 +61,7 @@ function PostagensOutroUsuario({ outroUsuario }) {
 
       try {
         const result = await fetch(
-          "http://localhost:5000/interacao/criarInteracao",
+          "https://link-us-virid.vercel.app/_/backend/interacao/criarInteracao",
           {
             method: "POST",
             body: JSON.stringify(data),
@@ -90,7 +90,7 @@ function PostagensOutroUsuario({ outroUsuario }) {
     ) {
       try {
         const res = await fetch(
-          `http://localhost:5000/interacao/deletarInteracao/${postagem.id_postagem}/${usuario.nome}/nenhum`,
+          `https://link-us-virid.vercel.app/_/backend/interacao/deletarInteracao/${postagem.id_postagem}/${usuario.nome}/nenhum`,
           {
             method: "DELETE",
             headers: {
@@ -118,7 +118,7 @@ function PostagensOutroUsuario({ outroUsuario }) {
 
       try {
         const res = await fetch(
-          `http://localhost:5000/interacao/atualizarInteracao`,
+          `https://link-us-virid.vercel.app/_/backend/interacao/atualizarInteracao`,
           {
             method: "PUT",
             body: JSON.stringify(data),

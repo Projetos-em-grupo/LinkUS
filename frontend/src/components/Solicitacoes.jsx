@@ -42,7 +42,7 @@ function Solicitacoes() {
                     data.destinatario = usuario.nome;
 
                     const result = await fetch(
-                      "http://localhost:5000/conexao/aceitarSolicitacao",
+                      "https://link-us-virid.vercel.app/_/backend/conexao/aceitarSolicitacao",
                       {
                         method: "PUT",
                         body: JSON.stringify(data),
@@ -71,7 +71,7 @@ function Solicitacoes() {
                     data.destinatario = usuario.nome;
 
                     const result = await fetch(
-                      "http://localhost:5000/conexao/recusarSolicitacao",
+                      "https://link-us-virid.vercel.app/_/backend/conexao/recusarSolicitacao",
                       {
                         method: "DELETE",
                         body: JSON.stringify(data),

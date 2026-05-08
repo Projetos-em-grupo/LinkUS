@@ -32,7 +32,7 @@ function Postagens({ termo }) {
 
       try {
         const result = await fetch(
-          "http://localhost:5000/interacao/criarInteracao",
+          "https://link-us-virid.vercel.app/_/backend/interacao/criarInteracao",
           {
             method: "POST",
             body: JSON.stringify(data),
@@ -65,7 +65,7 @@ function Postagens({ termo }) {
     ) {
       try {
         const res = await fetch(
-          `http://localhost:5000/interacao/deletarInteracao/${postagem.id_postagem}/${usuario.nome}/${comentario ? comentario.id_comentario : "nenhum"}`,
+          `https://link-us-virid.vercel.app/_/backend/interacao/deletarInteracao/${postagem.id_postagem}/${usuario.nome}/${comentario ? comentario.id_comentario : "nenhum"}`,
           {
             method: "DELETE",
             headers: {
@@ -93,7 +93,7 @@ function Postagens({ termo }) {
 
       try {
         const res = await fetch(
-          `http://localhost:5000/interacao/atualizarInteracao`,
+          `https://link-us-virid.vercel.app/_/backend/interacao/atualizarInteracao`,
           {
             method: "PUT",
             body: JSON.stringify(data),
@@ -275,7 +275,7 @@ function Postagens({ termo }) {
               info.nomeAutor = usuario.nome;
 
               const result = await fetch(
-                "http://localhost:5000/postagem/criarPostagem",
+                "https://link-us-virid.vercel.app/_/backend/postagem/criarPostagem",
                 {
                   method: "POST",
                   body: JSON.stringify(info),
@@ -417,7 +417,7 @@ function Postagens({ termo }) {
 
                           try {
                             const result = await fetch(
-                              "http://localhost:5000/comentario/criarComentarioPostagem",
+                              "https://link-us-virid.vercel.app/_/backend/comentario/criarComentarioPostagem",
                               {
                                 method: "POST",
                                 body: JSON.stringify(data),

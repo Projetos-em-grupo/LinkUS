@@ -13,7 +13,7 @@ export function GruposProvider({ children }) {
     setGruposUsuarioLoading(true);
     try {
       const result = await fetch(
-        `http://localhost:5000/grupo/acharGrupos/${nome}`,
+        `https://link-us-virid.vercel.app/_/backend/grupo/acharGrupos/${nome}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -34,12 +34,12 @@ export function GruposProvider({ children }) {
   useEffect(() => {
     async function acharGrupos() {
       try {
-        const res = await fetch("http://localhost:5000/grupo/acharGrupos", {
+        const res = await fetch("https://link-us-virid.vercel.app/_/backend/grupo/acharGrupos", {
           method: "GET",
         });
 
         if (res.status !== 200)
-          console.log("Erro de requisição: " + (await res.json()));
+          console.log("Erro de requisição: " + (await res.text()));
         else setGrupos(await res.json());
       } catch (error) {
         console.error("Erro ao carregar os grupos" + error);

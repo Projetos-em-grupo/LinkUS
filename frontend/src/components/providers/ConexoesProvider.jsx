@@ -11,7 +11,7 @@ export function ConexoesProvider({ children }) {
     setConexoesUsuarioLoading(true);
     try {
       const result = await fetch(
-        `http://localhost:5000/conexao/acharConexoes/${nome}`,
+        `https://link-us-virid.vercel.app/_/backend/conexao/acharConexoes/${nome}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

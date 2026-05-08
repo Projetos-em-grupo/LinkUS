@@ -38,7 +38,7 @@ function Cadastrar() {
             console.log(dados);
             try {
               const result = await fetch(
-                "http://localhost:5000/usuario/criarUsuario",
+                "https://link-us-virid.vercel.app/_/backend/usuario/criarUsuario",
                 {
                   method: "POST",
                   body: JSON.stringify(dados),
