@@ -49,7 +49,7 @@ export async function logarUsuario(req, res) {
   const email = req.body.email;
   const senha = req.body.senha;
   const logarSQL =
-    "SELECT u.*, JSON_ARRAYAGG(i.nome) AS interesses from usuario u left join usuario_interesse ui on ui.fk_usuario = u.id_usuario left join interesse i on ui.fk_interesse = i.id_interesse where email = ? group by u.email";
+    "SELECT u.id_usuario, u.nome, u.email, u.senha, u.url_foto, u.data_nascimento, COALESCE(JSON_AGG(i.nome) FILTER (WHERE i.nome IS NOT NULL), '[]'::json) AS interesses from usuario u left join usuario_interesse ui on ui.fk_usuario = u.id_usuario left join interesse i on ui.fk_interesse = i.id_interesse where email = ? group by u.id_usuario, u.nome, u.email, u.senha, u.url_foto, u.data_nascimento";
 
   try {
     const [result] = await pool.query(logarSQL, [email]);
@@ -93,7 +93,7 @@ export async function acharUsuariosPorInteresse(req, res) {
 
 export async function acharUsuarios(req, res) {
   const acharUsuariosSQL =
-    "SELECT u.nome, u.url_foto, u.data_nascimento, JSON_ARRAYAGG(i.nome) as interesses from usuario u left join usuario_interesse ui on u.id_usuario = ui.fk_usuario left join interesse i on i.id_interesse = ui.fk_interesse group by u.nome";
+    "SELECT u.nome, u.url_foto, u.data_nascimento, COALESCE(JSON_AGG(i.nome) FILTER (WHERE i.nome IS NOT NULL), '[]'::json) as interesses from usuario u left join usuario_interesse ui on u.id_usuario = ui.fk_usuario left join interesse i on i.id_interesse = ui.fk_interesse group by u.id_usuario, u.nome, u.url_foto, u.data_nascimento";
 
   try {
     const [resultAcharUsuarios] = await pool.query(acharUsuariosSQL);
@@ -113,7 +113,7 @@ export async function atualizarUsuario(req, res) {
   const atualizarUsuarioSQL = "UPDATE usuario set url_foto = ? where email = ?";
   const acharUsuarioSQL = "SELECT id_usuario from usuario where email = ?";
   const acharUsuarioAtualizadoSQL =
-    "SELECT u.*, JSON_ARRAYAGG(i.nome) AS interesses from usuario u left join usuario_interesse ui on ui.fk_usuario = u.id_usuario left join interesse i on ui.fk_interesse = i.id_interesse where email = ? group by u.email";
+    "SELECT u.id_usuario, u.nome, u.email, u.senha, u.url_foto, u.data_nascimento, COALESCE(JSON_AGG(i.nome) FILTER (WHERE i.nome IS NOT NULL), '[]'::json) AS interesses from usuario u left join usuario_interesse ui on ui.fk_usuario = u.id_usuario left join interesse i on ui.fk_interesse = i.id_interesse where email = ? group by u.id_usuario, u.nome, u.email, u.senha, u.url_foto, u.data_nascimento";
   const apagarUsuarioInteressesSQL =
     "DELETE from usuario_interesse where fk_usuario = ?";
   const interesseJaExisteSQL =

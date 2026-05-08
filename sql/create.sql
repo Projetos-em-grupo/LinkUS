@@ -1,103 +1,126 @@
-create database if not exists linkus;
-use linkus;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-create table if not exists interesse (
-	id_interesse char(36) primary key default (uuid()),
-    nome varchar(30) not null
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'conexao_status') THEN
+    CREATE TYPE conexao_status AS ENUM ('solicitado', 'aceito');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'mensagem_status') THEN
+    CREATE TYPE mensagem_status AS ENUM ('enviado', 'entregue', 'visualizado');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'participante_funcao') THEN
+    CREATE TYPE participante_funcao AS ENUM ('admin', 'user');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'postagem_tipo_conteudo') THEN
+    CREATE TYPE postagem_tipo_conteudo AS ENUM ('video', 'imagem');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'interacao_tipo') THEN
+    CREATE TYPE interacao_tipo AS ENUM ('like', 'dislike');
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS interesse (
+  id_interesse UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nome VARCHAR(30) NOT NULL
 );
 
-create table if not exists usuario (
-	id_usuario char(36) primary key default (uuid()),
-    nome varchar(150) not null unique,
-	email varchar(200) not null unique,
-    senha varchar(100) not null,
-    url_foto varchar(150),
-    data_nascimento date not null
+CREATE TABLE IF NOT EXISTS usuario (
+  id_usuario UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nome VARCHAR(150) NOT NULL UNIQUE,
+  email VARCHAR(200) NOT NULL UNIQUE,
+  senha VARCHAR(100) NOT NULL,
+  url_foto VARCHAR(150),
+  data_nascimento DATE NOT NULL
 );
 
-create table if not exists usuario_interesse (
-	fk_interesse char(36),
-    fk_usuario char(36),
-    primary key(fk_interesse, fk_usuario),
-    foreign key(fk_interesse) references interesse(id_interesse),
-    foreign key(fk_usuario) references usuario(id_usuario)
+CREATE TABLE IF NOT EXISTS usuario_interesse (
+  fk_interesse UUID,
+  fk_usuario UUID,
+  PRIMARY KEY (fk_interesse, fk_usuario),
+  FOREIGN KEY (fk_interesse) REFERENCES interesse(id_interesse),
+  FOREIGN KEY (fk_usuario) REFERENCES usuario(id_usuario)
 );
 
-create table if not exists conexao (
-    usuario_1 char(36) not null,
-    usuario_2 char(36) not null,
-    status enum("solicitado", "aceito") default "solicitado",
-    primary key(usuario_1, usuario_2),
-    foreign key(usuario_1) references usuario(id_usuario),
-	foreign key(usuario_2) references usuario(id_usuario)
+CREATE TABLE IF NOT EXISTS conexao (
+  usuario_1 UUID NOT NULL,
+  usuario_2 UUID NOT NULL,
+  status conexao_status DEFAULT 'solicitado',
+  PRIMARY KEY (usuario_1, usuario_2),
+  FOREIGN KEY (usuario_1) REFERENCES usuario(id_usuario),
+  FOREIGN KEY (usuario_2) REFERENCES usuario(id_usuario)
 );
 
-create table if not exists grupo (
-	id_grupo char(36) primary key default (uuid()),
-    nome varchar(100) not null unique,
-    descricao text not null,
-    data_criacao datetime default current_timestamp,
-    fk_criador char(36) not null,
-    foreign key(fk_criador) references usuario(id_usuario)
+CREATE TABLE IF NOT EXISTS grupo (
+  id_grupo UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nome VARCHAR(100) NOT NULL UNIQUE,
+  descricao TEXT NOT NULL,
+  data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  fk_criador UUID NOT NULL,
+  FOREIGN KEY (fk_criador) REFERENCES usuario(id_usuario)
 );
 
-create table if not exists mensagem (
-	id_mensagem char(36) primary key default (uuid()),
-    texto text not null,
-    data_envio datetime default current_timestamp,
-    status enum("enviado", "entregue", "visualizado") default "enviado",
-    fk_destinatario char(36),
-    fk_remetente char(36) not null,
-    fk_grupo char(36),
-    foreign key(fk_destinatario) references usuario(id_usuario),
-	foreign key(fk_remetente) references usuario(id_usuario),
-    foreign key(fk_grupo) references grupo(id_grupo),
-    constraint um_preenchido check (
-		    (fk_destinatario is not null or fk_grupo is not null) and
-        (fk_destinatario is null or fk_grupo is null)
-	)
+CREATE TABLE IF NOT EXISTS mensagem (
+  id_mensagem UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  texto TEXT NOT NULL,
+  data_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status mensagem_status DEFAULT 'enviado',
+  fk_destinatario UUID,
+  fk_remetente UUID NOT NULL,
+  fk_grupo UUID,
+  FOREIGN KEY (fk_destinatario) REFERENCES usuario(id_usuario),
+  FOREIGN KEY (fk_remetente) REFERENCES usuario(id_usuario),
+  FOREIGN KEY (fk_grupo) REFERENCES grupo(id_grupo),
+  CONSTRAINT um_preenchido CHECK (
+    (fk_destinatario IS NOT NULL OR fk_grupo IS NOT NULL) AND
+    (fk_destinatario IS NULL OR fk_grupo IS NULL)
+  )
 );
 
-create table if not exists participante(
-	fk_grupo char(36),
-    fk_participante char(36),
-    funcao enum("admin", "user") default "user",
-    primary key(fk_grupo, fk_participante),
-    foreign key(fk_grupo) references grupo(id_grupo),
-    foreign key(fk_participante) references usuario(id_usuario)
+CREATE TABLE IF NOT EXISTS participante (
+  fk_grupo UUID,
+  fk_participante UUID,
+  funcao participante_funcao DEFAULT 'user',
+  PRIMARY KEY (fk_grupo, fk_participante),
+  FOREIGN KEY (fk_grupo) REFERENCES grupo(id_grupo),
+  FOREIGN KEY (fk_participante) REFERENCES usuario(id_usuario)
 );
 
-create table if not exists postagem(
-	id_postagem char(36) primary key default (uuid()),
-    data_criacao datetime default current_timestamp,
-    tipo_conteudo enum("audio", "imagem"),
-    texto text,
-    url_midia varchar(150),
-    fk_autor char(36) not null,
-    foreign key(fk_autor) references usuario(id_usuario),
-    constraint algum_preenchido check(
-        texto is not null or url_midia is not null
-    )
+CREATE TABLE IF NOT EXISTS postagem (
+  id_postagem UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  tipo_conteudo postagem_tipo_conteudo,
+  texto TEXT,
+  url_midia VARCHAR(150),
+  fk_autor UUID NOT NULL,
+  FOREIGN KEY (fk_autor) REFERENCES usuario(id_usuario),
+  CONSTRAINT algum_preenchido CHECK (
+    texto IS NOT NULL OR url_midia IS NOT NULL
+  )
 );
 
-create table if not exists comentario(
-	id_comentario char(36) primary key default (uuid()),
-    conteudo text not null,
-	fk_autor char(36) not null,
-    fk_postagem char(36) not null,
-    fk_comentario_pai char(36),
-    foreign key(fk_autor) references usuario(id_usuario),
-	foreign key(fk_postagem) references postagem(id_postagem),
-	foreign key(fk_comentario_pai) references comentario(id_comentario)
+CREATE TABLE IF NOT EXISTS comentario (
+  id_comentario UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  conteudo TEXT NOT NULL,
+  fk_autor UUID NOT NULL,
+  fk_postagem UUID NOT NULL,
+  fk_comentario_pai UUID,
+  FOREIGN KEY (fk_autor) REFERENCES usuario(id_usuario),
+  FOREIGN KEY (fk_postagem) REFERENCES postagem(id_postagem),
+  FOREIGN KEY (fk_comentario_pai) REFERENCES comentario(id_comentario)
 );
 
-create table if not exists interacao(
-	id_interacao char(36) primary key default (uuid()),
-	tipo enum("like", "dislike") not null,
-	fk_postagem char(36) not null,
-    fk_usuario char(36) not null,
-    fk_comentario char(36),
-    foreign key(fk_postagem) references postagem(id_postagem),
-    foreign key(fk_usuario) references usuario(id_usuario),
-	foreign key(fk_comentario) references comentario(id_comentario)
+CREATE TABLE IF NOT EXISTS interacao (
+  id_interacao UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tipo interacao_tipo NOT NULL,
+  fk_postagem UUID NOT NULL,
+  fk_usuario UUID NOT NULL,
+  fk_comentario UUID,
+  FOREIGN KEY (fk_postagem) REFERENCES postagem(id_postagem),
+  FOREIGN KEY (fk_usuario) REFERENCES usuario(id_usuario),
+  FOREIGN KEY (fk_comentario) REFERENCES comentario(id_comentario)
 );

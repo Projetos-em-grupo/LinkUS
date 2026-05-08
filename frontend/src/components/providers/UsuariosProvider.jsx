@@ -9,12 +9,12 @@ export function UsuariosProvider({ children }) {
   useEffect(() => {
     async function acharUsuarios() {
       try {
-        const res = await fetch("http://localhost:5000/usuario/acharUsuarios", {
+        const res = await fetch("https://link-us-virid.vercel.app/_/backend/usuario/acharUsuarios", {
           method: "GET",
         });
 
         if (res.status !== 200)
-          console.log("Erro de requisição: " + (await res.json()));
+          console.log("Erro de requisição: " + (await res.text()));
         else setUsuarios(await res.json());
       } catch (error) {
         console.error("Erro ao carregar os usuários" + error);

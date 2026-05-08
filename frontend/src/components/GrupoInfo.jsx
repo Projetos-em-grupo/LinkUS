@@ -13,7 +13,7 @@ function GrupoInfo({ grupo }) {
     if (grupo) {
       async function acharParticipantes() {
         const res = await fetch(
-          `http://localhost:5000/grupo/acharUsuarios/${grupo.id_grupo}`,
+          `https://link-us-virid.vercel.app/_/backend/grupo/acharUsuarios/${grupo.id_grupo}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -75,7 +75,7 @@ function GrupoInfo({ grupo }) {
                       };
 
                       const res = await fetch(
-                        "http://localhost:5000/grupo/administrarParticipante",
+                        "https://link-us-virid.vercel.app/_/backend/grupo/administrarParticipante",
                         {
                           method: "PUT",
                           body: JSON.stringify(data),

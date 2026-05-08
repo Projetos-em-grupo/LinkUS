@@ -12,7 +12,7 @@ export function MensagensProvider({ children }) {
     setMensagensUsuarioLoading(true);
     try {
       const result = await fetch(
-        `http://localhost:5000/mensagem/listarConversasUsuario/${email}`,
+        `https://link-us-virid.vercel.app/_/backend/mensagem/listarConversasUsuario/${email}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

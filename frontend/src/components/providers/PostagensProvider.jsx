@@ -14,7 +14,7 @@ export function PostagensProvider({ children }) {
     setPostagensUsuarioLoading(true);
     try {
       const result = await fetch(
-        `http://localhost:5000/postagem/acharPostagensUsuario/${nome}`,
+        `https://link-us-virid.vercel.app/_/backend/postagem/acharPostagensUsuario/${nome}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -34,7 +34,7 @@ export function PostagensProvider({ children }) {
           posts.map(async (post) => {
             try {
               const resInteracao = await fetch(
-                `http://localhost:5000/interacao/temInteracaoPost`,
+                `https://link-us-virid.vercel.app/_/backend/interacao/temInteracaoPost`,
                 {
                   method: "POST",
                   body: JSON.stringify({
@@ -75,7 +75,7 @@ export function PostagensProvider({ children }) {
     async function acharPostagens() {
       try {
         const res = await fetch(
-          "http://localhost:5000/postagem/acharPostagens",
+          "https://link-us-virid.vercel.app/_/backend/postagem/acharPostagens",
           {
             method: "GET",
           }
@@ -93,7 +93,7 @@ export function PostagensProvider({ children }) {
             posts.map(async (post) => {
               try {
                 const resInteracao = await fetch(
-                  `http://localhost:5000/interacao/temInteracaoPost`,
+                  `https://link-us-virid.vercel.app/_/backend/interacao/temInteracaoPost`,
                   {
                     method: "POST",
                     body: JSON.stringify({
@@ -120,7 +120,7 @@ export function PostagensProvider({ children }) {
                     post.comentarios.map(async (comentario) => {
                       try {
                         const resInteracaoComent = await fetch(
-                          `http://localhost:5000/interacao/temInteracaoComentario`,
+                          `https://link-us-virid.vercel.app/_/backend/interacao/temInteracaoComentario`,
                           {
                             method: "POST",
                             body: JSON.stringify({

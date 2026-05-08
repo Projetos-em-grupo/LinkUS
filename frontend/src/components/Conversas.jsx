@@ -26,7 +26,7 @@ function Conversas({ conversa, setConversa, setModal }) {
     };
 
     try {
-      const result = await fetch("http://localhost:5000/grupo/criarGrupo", {
+      const result = await fetch("https://link-us-virid.vercel.app/_/backend/grupo/criarGrupo", {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
@@ -41,7 +41,7 @@ function Conversas({ conversa, setConversa, setModal }) {
       }
 
       for (const integrante of novosIntegrantes) {
-        const res = await fetch("http://localhost:5000/grupo/participarGrupo", {
+        const res = await fetch("https://link-us-virid.vercel.app/_/backend/grupo/participarGrupo", {
           method: "POST",
           body: JSON.stringify({
             nomeUsuario: integrante.nome,
@@ -80,7 +80,7 @@ function Conversas({ conversa, setConversa, setModal }) {
     if (conversa.tipo === "grupo") {
       try {
         const result = await fetch(
-          "http://localhost:5000/mensagem/mandarMensagemGrupo",
+          "https://link-us-virid.vercel.app/_/backend/mensagem/mandarMensagemGrupo",
           {
             method: "POST",
             body: JSON.stringify(data),
@@ -102,7 +102,7 @@ function Conversas({ conversa, setConversa, setModal }) {
     } else {
       try {
         const result = await fetch(
-          "http://localhost:5000/mensagem/mandarMensagem",
+          "https://link-us-virid.vercel.app/_/backend/mensagem/mandarMensagem",
           {
             method: "POST",
             body: JSON.stringify(data),
@@ -132,7 +132,7 @@ function Conversas({ conversa, setConversa, setModal }) {
     if (conversa) {
       async function acharMensagens() {
         const result = await fetch(
-          `http://localhost:5000/mensagem/listarMensagensConversa/${usuario.nome}/${conversa.nome}/${conversa.tipo}`,
+          `https://link-us-virid.vercel.app/_/backend/mensagem/listarMensagensConversa/${usuario.nome}/${conversa.nome}/${conversa.tipo}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -218,7 +218,7 @@ function Conversas({ conversa, setConversa, setModal }) {
                         };
 
                         const res = await fetch(
-                          "http://localhost:5000/mensagem/excluirMensagemGrupo",
+                          "https://link-us-virid.vercel.app/_/backend/mensagem/excluirMensagemGrupo",
                           {
                             method: "DELETE",
                             body: JSON.stringify(data),
@@ -243,7 +243,7 @@ function Conversas({ conversa, setConversa, setModal }) {
                         };
 
                         const res = await fetch(
-                          "http://localhost:5000/mensagem/excluirMensagem",
+                          "https://link-us-virid.vercel.app/_/backend/mensagem/excluirMensagem",
                           {
                             method: "DELETE",
                             body: JSON.stringify(data),

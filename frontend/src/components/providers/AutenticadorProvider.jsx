@@ -31,7 +31,7 @@ export function AutenticadorProvider({ children }) {
   }, [tokenNovo]);
 
   async function login(email, senha) {
-    const result = await fetch("http://localhost:5000/usuario/logarUsuario", {
+    const result = await fetch("https://link-us-virid.vercel.app/_/backend/usuario/logarUsuario", {
       method: "POST",
       body: JSON.stringify({ email, senha }),
       headers: {
