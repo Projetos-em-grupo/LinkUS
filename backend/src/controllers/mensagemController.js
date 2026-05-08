@@ -178,10 +178,6 @@ export async function listarConversasUsuario(req, res) {
       idUsuario,
       idUsuario,
       idUsuario,
-      idUsuario,
-      idUsuario,
-      idUsuario,
-      idUsuario,
     ]);
 
     const [conversasGrupos] = await pool.query(listarConversasGrupoSQL, [

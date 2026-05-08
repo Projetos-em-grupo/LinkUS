@@ -13,9 +13,14 @@ import { verificarToken } from "./middlewareAutenticador.js";
 
 dotenv.config();
 
-console.log("⚙️ Iniciando servidor Node...");
-console.log("🔧 Porta:", process.env.PORT);
-console.log("🔧 Host do banco:", process.env.DB_HOST);
+console.log("Iniciando servidor Node...");
+console.log("Porta:", process.env.PORT);
+console.log(
+  "Banco configurado:",
+  process.env.DATABASE_URL || process.env.SUPABASE_DB_URL
+    ? "Supabase/Postgres"
+    : "nao configurado"
+);
 
 const PORT = process.env.PORT || 8080;
 
@@ -25,23 +30,16 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/usuario", usuariosRoutes);
-
 app.use("/usuarioInteresse", verificarToken, usuariosInteressesRoutes);
-
 app.use("/conexao", conexoesRoutes);
-
 app.use("/grupo", gruposRoutes);
-
 app.use("/mensagem", verificarToken, mensagensRoutes);
-
 app.use("/postagem", postagensRoutes);
-
 app.use("/comentario", comentariosRoutes);
-
 app.use("/interacao", interacoesRoutes);
 
 app.get("/", (req, res) => res.send("Servidor rodando"));
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta:  ${PORT}`);
+  console.log(`Servidor rodando na porta: ${PORT}`);
 });

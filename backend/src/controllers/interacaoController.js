@@ -58,17 +58,20 @@ export async function deletarInteracao(req, res) {
   let deletarInteracaoSQL;
   if (id_comentario === "nenhum")
     deletarInteracaoSQL =
-      "DELETE i.* from interacao i join postagem p on i.fk_postagem = p.id_postagem join usuario u on i.fk_usuario = u.id_usuario where u.nome = ? and id_postagem = ? and fk_comentario is null";
+      "DELETE FROM interacao i USING usuario u WHERE i.fk_usuario = u.id_usuario AND u.nome = ? AND i.fk_postagem = ? AND i.fk_comentario is null";
   else
     deletarInteracaoSQL =
-      "DELETE i.* from interacao i join postagem p on i.fk_postagem = p.id_postagem join usuario u on i.fk_usuario = u.id_usuario where u.nome = ? and id_postagem = ? and fk_comentario = ?";
+      "DELETE FROM interacao i USING usuario u WHERE i.fk_usuario = u.id_usuario AND u.nome = ? AND i.fk_postagem = ? AND i.fk_comentario = ?";
 
   try {
-    const [resultDeletarInteracao] = await pool.query(deletarInteracaoSQL, [
-      nome,
-      id_postagem,
-      id_comentario,
-    ]);
+    const params =
+      id_comentario === "nenhum"
+        ? [nome, id_postagem]
+        : [nome, id_postagem, id_comentario];
+    const [resultDeletarInteracao] = await pool.query(
+      deletarInteracaoSQL,
+      params
+    );
     if (!resultDeletarInteracao)
       return res.status(404).send("Usuário não encontrado");
     return res.status(200).send("Interação removida com sucesso");
@@ -83,18 +86,19 @@ export async function atualizarInteracao(req, res) {
   let atualizarInteracaoSQL;
   if (!id_comentario)
     atualizarInteracaoSQL =
-      "UPDATE interacao i join postagem p on i.fk_postagem = p.id_postagem join usuario u on i.fk_usuario = u.id_usuario set i.tipo = ? where u.nome = ? and id_postagem = ? and i.fk_comentario is null";
+      "UPDATE interacao i SET tipo = ? FROM usuario u WHERE i.fk_usuario = u.id_usuario AND u.nome = ? AND i.fk_postagem = ? AND i.fk_comentario is null";
   else
     atualizarInteracaoSQL =
-      "UPDATE interacao i join postagem p on i.fk_postagem = p.id_postagem join usuario u on i.fk_usuario = u.id_usuario set i.tipo = ? where u.nome = ? and id_postagem = ? and i.fk_comentario = ?";
+      "UPDATE interacao i SET tipo = ? FROM usuario u WHERE i.fk_usuario = u.id_usuario AND u.nome = ? AND i.fk_postagem = ? AND i.fk_comentario = ?";
 
   try {
-    const [resultAtualizarInteracao] = await pool.query(atualizarInteracaoSQL, [
-      interacao,
-      nome,
-      id_postagem,
-      id_comentario,
-    ]);
+    const params = !id_comentario
+      ? [interacao, nome, id_postagem]
+      : [interacao, nome, id_postagem, id_comentario];
+    const [resultAtualizarInteracao] = await pool.query(
+      atualizarInteracaoSQL,
+      params
+    );
 
     if (!resultAtualizarInteracao)
       return res.status(404).send("Usuário não encontrado");

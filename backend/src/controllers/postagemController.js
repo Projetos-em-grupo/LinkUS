@@ -63,7 +63,7 @@ export async function acharPostagens(req, res) {
       p.url_midia, 
       u.nome, 
       u.url_foto,
-      JSON_ARRAYAGG(i.nome) as interesses
+      COALESCE(JSON_AGG(i.nome) FILTER (WHERE i.nome IS NOT NULL), '[]'::json) as interesses
         FROM 
           postagem p
         JOIN 
@@ -73,7 +73,7 @@ export async function acharPostagens(req, res) {
         LEFT JOIN 
           interesse i ON ui.fk_interesse = i.id_interesse
         GROUP BY 
-      p.id_postagem`;
+      p.id_postagem, p.data_criacao, p.tipo_conteudo, p.texto, p.url_midia, u.nome, u.url_foto`;
 
   const acharAvaliacoesPositivasSQL =
     "SELECT COUNT(*) as positivas from interacao i join postagem p on i.fk_postagem = p.id_postagem where p.id_postagem = ? and i.tipo = 'like' and i.fk_comentario IS NULL";
@@ -82,7 +82,7 @@ export async function acharPostagens(req, res) {
     "SELECT COUNT(*) as negativas from interacao i join postagem p on i.fk_postagem = p.id_postagem where p.id_postagem = ? and i.tipo = 'dislike' and i.fk_comentario IS NULL";
 
   const acharComentariosSQL =
-    "SELECT c.id_comentario, c.conteudo, c.data_criacao, u.nome, u.url_foto, c.fk_comentario_pai, COALESCE(SUM(i.tipo = 'like'), 0) as positivas, COALESCE(SUM(i.tipo = 'dislike'), 0) as negativas FROM comentario c JOIN usuario u ON u.id_usuario = c.fk_autor LEFT JOIN interacao i ON i.fk_comentario = c.id_comentario WHERE c.fk_postagem = ? GROUP BY c.id_comentario ORDER BY c.data_criacao";
+    "SELECT c.id_comentario, c.conteudo, c.data_criacao, u.nome, u.url_foto, c.fk_comentario_pai, COALESCE(SUM(CASE WHEN i.tipo = 'like' THEN 1 ELSE 0 END), 0)::int as positivas, COALESCE(SUM(CASE WHEN i.tipo = 'dislike' THEN 1 ELSE 0 END), 0)::int as negativas FROM comentario c JOIN usuario u ON u.id_usuario = c.fk_autor LEFT JOIN interacao i ON i.fk_comentario = c.id_comentario WHERE c.fk_postagem = ? GROUP BY c.id_comentario, c.conteudo, c.data_criacao, u.nome, u.url_foto, c.fk_comentario_pai ORDER BY c.data_criacao";
 
   try {
     const [resultAcharPostagens] = await pool.query(acharPostagensSQL);
@@ -132,7 +132,7 @@ export async function acharPostagensUsuario(req, res) {
     "SELECT COUNT(*) as negativas from interacao i join postagem p on i.fk_postagem = p.id_postagem where p.id_postagem = ? and i.tipo = 'dislike' and i.fk_comentario IS NULL";
 
   const acharComentariosSQL =
-    "SELECT c.id_comentario, c.conteudo, c.data_criacao, u.nome, u.url_foto, c.fk_comentario_pai, COALESCE(SUM(i.tipo = 'like'), 0) as positivas, COALESCE(SUM(i.tipo = 'dislike'), 0) as negativas FROM comentario c JOIN usuario u ON u.id_usuario = c.fk_autor LEFT JOIN interacao i ON i.fk_comentario = c.id_comentario WHERE c.fk_postagem = ? GROUP BY c.id_comentario ORDER BY c.data_criacao";
+    "SELECT c.id_comentario, c.conteudo, c.data_criacao, u.nome, u.url_foto, c.fk_comentario_pai, COALESCE(SUM(CASE WHEN i.tipo = 'like' THEN 1 ELSE 0 END), 0)::int as positivas, COALESCE(SUM(CASE WHEN i.tipo = 'dislike' THEN 1 ELSE 0 END), 0)::int as negativas FROM comentario c JOIN usuario u ON u.id_usuario = c.fk_autor LEFT JOIN interacao i ON i.fk_comentario = c.id_comentario WHERE c.fk_postagem = ? GROUP BY c.id_comentario, c.conteudo, c.data_criacao, u.nome, u.url_foto, c.fk_comentario_pai ORDER BY c.data_criacao";
 
   try {
     const [resultAcharPostagens] = await pool.query(acharPostagensSQL, [

@@ -116,7 +116,7 @@ export async function acharConexoes(req, res) {
   const acharUsuarioPorNomeSQL =
     "SELECT id_usuario from usuario where nome = ?";
   const acharConexoesSQL =
-    "select u.nome, u.url_foto, c.status, IF(u.id_usuario = usuario_1, 'remetente', 'destinatario') as requisicao from conexao c join usuario u on (usuario_1 = u.id_usuario or usuario_2 = u.id_usuario) where (usuario_1 = ? or usuario_2 = ?) and u.id_usuario != ?";
+    "select u.nome, u.url_foto, c.status, CASE WHEN u.id_usuario = usuario_1 THEN 'remetente' ELSE 'destinatario' END as requisicao from conexao c join usuario u on (usuario_1 = u.id_usuario or usuario_2 = u.id_usuario) where (usuario_1 = ? or usuario_2 = ?) and u.id_usuario != ?";
 
   try {
     const [resultAcharUsuarioPorNome] = await pool.query(
