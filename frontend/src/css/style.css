@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   /* Reset and base styles */
@@ -25,12 +23,25 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Lato', 'sans-serif';
   }
 }
 
 @layer components {
   /* Global utility classes */
+  .react-datepicker-wrapper {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .react-datepicker__input-container {
+    width: 100% !important;
+  }
+
+  .react-datepicker__input-container input {
+    width: 100% !important;
+  }
+
   .modal {
     position: fixed;
     left: 0;
@@ -42,11 +53,12 @@
   }
 
   .modal-content {
-    width: 40%;
+    width: 30%;
+    min-width: 500px;
     background-color: #111827; /* neutral-900 */
     margin: 6% auto;
     padding: 2rem;
-    border-radius: 0.5rem;
+    border-radius: 1rem;
     max-height: 80vh;
   }
 

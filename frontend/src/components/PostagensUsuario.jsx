@@ -10,13 +10,15 @@ function PostagensUsuario() {
   const [editarPerfil, setEditarPerfil] = useState(false);
   const [novaFoto, setNovaFoto] = useState(null);
   const [novosInteresses, setNovosInteresses] = useState([]);
-  const [ativarInput, setAtivarInput] = useState(false);
+  const [inputQuantidade, setInputQuantidade] = useState(0);
   const [jaCarregou, setJaCarregou] = useState(false);
+  const [fotoPreview, setFotoPreview] = useState("./icons/padrao.svg");
 
   async function atualizarPerfil() {
     const data = {};
     data.email = usuario.email;
     data.interesses = novosInteresses;
+
     if (novaFoto) {
       const formData = new FormData();
       formData.append("image", novaFoto);
@@ -33,24 +35,29 @@ function PostagensUsuario() {
       } catch (err) {
         console.error("Erro de rede:", err);
       }
-    } else data.url_foto = usuario.url_foto;
+    } else {
+      data.url_foto = usuario.url_foto;
+    }
 
-    const res = await fetch("https://link-us-virid.vercel.app/_/backend/usuario/atualizarUsuario", {
-      method: "PUT",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await fetch(
+      "https://link-us-virid.vercel.app/_/backend/usuario/atualizarUsuario",
+      {
+        method: "PUT",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-    if (res.status === 200) setTokenNovo(await res.json());
-    else
+    if (res.status === 200) {
+      setTokenNovo(await res.json());
+      setNovaFoto(null);
+      setEditarPerfil(false);
+    } else {
       console.error("Erro ao tentar atualizar o perfil: " + (await res.text()));
-
-    setNovosInteresses(usuario.interesses);
-    setNovaFoto(null);
-    setEditarPerfil(false);
+    }
   }
 
   async function interagirPostagem(postagem, tipo) {
@@ -102,10 +109,11 @@ function PostagensUsuario() {
           }
         );
 
-        if (res.status === 200) acharPostagensPorUsuario(usuario.nome);
-        else {
+        if (res.status === 200) {
+          acharPostagensPorUsuario(usuario.nome);
+        } else {
           console.error(
-            "Erro ao tentar remover interação: " + (await res.text())
+            "Erro ao tentar remover interacao: " + (await res.text())
           );
         }
       } catch (error) {
@@ -121,7 +129,7 @@ function PostagensUsuario() {
 
       try {
         const res = await fetch(
-          `https://link-us-virid.vercel.app/_/backend/interacao/atualizarInteracao`,
+          "https://link-us-virid.vercel.app/_/backend/interacao/atualizarInteracao",
           {
             method: "PUT",
             body: JSON.stringify(data),
@@ -132,11 +140,13 @@ function PostagensUsuario() {
           }
         );
 
-        if (res.status !== 200)
+        if (res.status !== 200) {
           console.error(
-            "Erro ao tentar atualizar a interação" + (await res.text())
+            "Erro ao tentar atualizar a interacao" + (await res.text())
           );
-        else acharPostagensPorUsuario(usuario.nome);
+        } else {
+          acharPostagensPorUsuario(usuario.nome);
+        }
       } catch (error) {
         console.error("Erro interno do servidor: " + error);
       }
@@ -148,12 +158,27 @@ function PostagensUsuario() {
       acharPostagensPorUsuario(usuario.nome);
       setJaCarregou(true);
     }
-  }, [usuario]);
+  }, [usuario, jaCarregou, acharPostagensPorUsuario]);
 
   useEffect(() => {
-    if (usuario?.interesses && usuario.interesses[0] != null)
+    if (usuario?.interesses && usuario.interesses[0] != null) {
       setNovosInteresses(usuario.interesses);
+    }
   }, [usuario?.interesses]);
+
+  useEffect(() => {
+    if (!novaFoto) {
+      setFotoPreview(usuario?.url_foto ?? "./icons/padrao.svg");
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(novaFoto);
+    setFotoPreview(previewUrl);
+
+    return () => {
+      URL.revokeObjectURL(previewUrl);
+    };
+  }, [novaFoto, usuario?.url_foto]);
 
   return (
     <div className="mt-6 max-h-125 overflow-y-auto pr-4">
@@ -163,34 +188,42 @@ function PostagensUsuario() {
             <img
               id="foto-perfil"
               src={usuario?.url_foto ? usuario.url_foto : "./icons/padrao.svg"}
-              alt="Foto de perfil do usuário"
+              alt="Foto de perfil do usuario"
               className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-primary-200 shadow-md"
             />
             <div>
-              <p className="font-lato font-bold text-xl text-neutral-800">@{usuario?.nome}</p>
-              <p className="font-lato text-sm text-neutral-600 mt-1">Membro desde {new Date().getFullYear()}</p>
+              <p className="font-lato font-bold text-xl text-neutral-800">
+                @{usuario?.nome}
+              </p>
+              <p className="font-lato text-sm text-neutral-600 mt-1">
+                Membro desde {new Date().getFullYear()}
+              </p>
             </div>
           </div>
           <button
-            onClick={() => {
-              console.log(usuario);
-              setEditarPerfil(true);
-            }}
-            className="px-6 py-3 bg-primary-500 text-white rounded-full font-medium hover:bg-primary-600 transition-colors shadow-md hover:shadow-lg"
+            onClick={() => setEditarPerfil(true)}
+            className="px-6 py-3 bg-primary-500 bg-linear-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-600 hover:to-cyan-700 shadow-md hover:shadow-lg rounded-full font-medium hover:bg-primary-600 transition-colors hover:cursor-pointer"
           >
             Editar perfil
           </button>
         </div>
+
         {usuario?.interesses && usuario.interesses[0] && (
           <div className="mb-6">
-            <h3 className="font-lato font-semibold text-lg text-neutral-800 mb-3">Interesses</h3>
+            <h3 className="font-lato font-semibold text-lg text-neutral-800 mb-3">
+              Interesses
+            </h3>
             <div className="flex flex-wrap gap-3">
               {usuario.interesses.map((interesse) => (
-                <span 
+                <span
                   key={interesse}
-                  className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-4 py-2 rounded-full flex gap-2 items-center shadow-sm"
+                  className="bg-linear-to-r from-primary-500 to-secondary-500 text-white px-4 py-2 rounded-full flex gap-2 items-center shadow-sm"
                 >
-                  <img src="./icons/hashtag.svg" alt="Ícone de hashtag" className="w-4 h-4" />
+                  <img
+                    src="./icons/hashtag.svg"
+                    alt="Icone de hashtag"
+                    className="w-4 h-4"
+                  />
                   <p className="font-medium text-sm">{interesse}</p>
                 </span>
               ))}
@@ -198,6 +231,7 @@ function PostagensUsuario() {
           </div>
         )}
       </div>
+
       <ul className="space-y-6">
         {postagensUsuario &&
           postagensUsuario.map((postagem) => (
@@ -209,11 +243,13 @@ function PostagensUsuario() {
                 <img
                   id="foto-perfil"
                   src={postagem.url_foto || "./icons/padrao.svg"}
-                  alt={`Foto do usuário ${postagem.nome}`}
-                  className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                  alt={`Foto do usuario ${postagem.nome}`}
+                  className="w-12 h-12 rounded-full object-cover shrink-0"
                 />
                 <div>
-                  <h2 className="font-lato font-semibold text-base">{postagem.nome}</h2>
+                  <h2 className="font-lato font-semibold text-base">
+                    {postagem.nome}
+                  </h2>
                   <p className="font-poppins text-xs text-neutral-600">
                     {formatDistanceToNow(new Date(postagem.data_criacao), {
                       addSuffix: true,
@@ -234,7 +270,11 @@ function PostagensUsuario() {
               )}
 
               {postagem.tipo_conteudo === "video" && (
-                <video controls width="500" className="w-full max-w-2xl rounded-lg mb-4">
+                <video
+                  controls
+                  width="500"
+                  className="w-full max-w-2xl rounded-lg mb-4"
+                >
                   <source src={postagem.url_midia} type="video/mp4" />
                 </video>
               )}
@@ -248,7 +288,7 @@ function PostagensUsuario() {
                         ? "./icons/like-dado.svg"
                         : "./icons/like.svg"
                     }
-                    alt="Ícone de like"
+                    alt="Icone de like"
                     className="w-6 h-6"
                   />
                   <p className="font-poppins text-sm">{postagem.positivas}</p>
@@ -261,7 +301,7 @@ function PostagensUsuario() {
                         ? "./icons/dislike-dado.svg"
                         : "./icons/dislike.svg"
                     }
-                    alt="Ícone de dislike"
+                    alt="Icone de dislike"
                     className="w-6 h-6"
                   />
                   <p className="font-poppins text-sm">{postagem.negativas}</p>
@@ -270,19 +310,29 @@ function PostagensUsuario() {
             </li>
           ))}
       </ul>
+
       {editarPerfil && (
-        <div className="modal" onClick={() => setEditarPerfil(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-start items-center mb-5">
+        <div
+          className="modal flex items-center justify-center p-4"
+          onClick={() => setEditarPerfil(false)}
+        >
+          <div
+            className="w-full max-w-2xl rounded-3xl bg-neutral-900 p-6 md:p-8 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 mb-6">
               <img
                 src="./icons/fechar.svg"
                 alt="Fechar aba de editar perfil"
                 onClick={() => setEditarPerfil(false)}
                 className="w-6 h-6 cursor-pointer"
               />
-              <p className="font-poppins font-semibold text-neutral-200 ml-2">Editar perfil</p>
+              <p className="font-poppins font-semibold text-neutral-200 text-2xl">
+                Editar perfil
+              </p>
             </div>
-            <div className="flex justify-start items-center gap-6 mb-6">
+
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-8">
               <input
                 type="file"
                 id="midia"
@@ -293,79 +343,101 @@ function PostagensUsuario() {
                   setNovaFoto(e.target.files[0]);
                 }}
               />
-              <label htmlFor="midia" className="cursor-pointer">
+
+              <label
+                htmlFor="midia"
+                className="cursor-pointer self-start sm:self-center"
+              >
                 <img
                   id="foto-perfil"
-                  src={usuario.url_foto ?? "./icons/padrao.svg"}
+                  src={fotoPreview}
                   alt="Foto de perfil"
-                  className="w-40 h-40 rounded-full object-cover"
+                  className="w-24 h-24 rounded-full object-cover border-4 border-cyan-400 shadow-lg"
                 />
               </label>
-              <a 
+
+              <button
+                type="button"
                 onClick={() => atualizarPerfil()}
-                className="bg-neutral-200 text-primary-600 px-9 py-3 rounded-full font-poppins font-semibold cursor-pointer hover:bg-primary-600 hover:text-white transition-colors"
+                className="self-start sm:self-center bg-linear-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-600 hover:to-cyan-700 shadow-md hover:shadow-lg px-8 py-3 rounded-full font-poppins font-semibold transition-colors"
               >
-                <p>salvar</p>
-              </a>
+                salvar
+              </button>
             </div>
-            <label
-              htmlFor={ativarInput ? "interesse" : ""}
-              onClick={() => {
-                if (novosInteresses.length < 5) {
-                  setAtivarInput(true);
-                }
-              }}
-              className="border border-neutral-500 p-5 display-block cursor-pointer"
-            >
-              <p className="font-poppins font-semibold text-neutral-200 mb-3">Tags</p>
+
+            <div className="border border-neutral-600 rounded-2xl p-5">
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <p className="font-poppins font-semibold text-neutral-200 text-xl">
+                  Tags
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (inputQuantidade < 5 && (inputQuantidade + novosInteresses.length < 5)) {
+                      setInputQuantidade((prev) => prev + 1);
+                    }
+                  }}
+                  className="text-sm text-cyan-300 hover:text-cyan-200 transition-colors cursor-pointer"
+                >
+                  adicionar tag
+                </button>
+              </div>
+
               <ul className="flex flex-wrap gap-3">
                 {novosInteresses &&
                   novosInteresses[0] != null &&
-                  novosInteresses.map((interesse) => {
-                    return (
-                      <li 
-                        key={interesse}
-                        className="bg-primary-500 text-neutral-100 px-3 py-2 rounded-2xl flex items-center gap-2"
+                  novosInteresses.map((interesse) => (
+                    <li
+                      key={interesse}
+                      className="bg-primary-500 text-neutral-100 px-3 py-2 rounded-2xl flex items-center gap-2"
+                    >
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setNovosInteresses((prev) =>
+                            prev.filter((i) => i !== interesse)
+                          )
+                        }
+                        className="cursor-pointer"
                       >
                         <img
                           src="./icons/fechar.svg"
-                          alt="Ícone de remover interesse"
-                          onClick={() =>
-                            setNovosInteresses((prev) =>
-                              prev.filter((i) => i !== interesse)
-                            )
-                          }
-                          className="w-4 h-4 cursor-pointer"
+                          alt="Icone de remover interesse"
+                          className="w-4 h-4"
                         />
-                        <p className="font-poppins text-sm">{interesse}</p>
-                      </li>
-                    );
-                  })}
+                      </button>
+                      <p className="font-poppins text-sm">{interesse}</p>
+                    </li>
+                  ))}
               </ul>
-              <input
-                type="text"
-                id="interesse"
-                style={{
-                  display: novosInteresses.length >= 5 ? "none" : "block",
-                }}
-                className="mt-3 bg-dark-800 text-neutral-200 px-4 py-2 border border-neutral-500 rounded-lg font-poppins text-sm focus:outline-none focus:border-primary-500"
-                onKeyUp={(e) => {
-                  if (e.key === "Enter") {
-                    const valor = e.target.value.trim().toLowerCase();
-                    if (valor !== "" && !novosInteresses.includes(valor)) {
-                      setNovosInteresses((prev) => {
-                        console.log([...prev, valor]);
-                        return [...prev, valor];
-                      });
-                      e.target.value = "";
-                    }
-                    if (novosInteresses.length + 1 >= 5) {
-                      setAtivarInput(false);
-                    }
-                  }
-                }}
-              />
-            </label>
+
+              {novosInteresses.length < 5 && inputQuantidade && (function() {
+                const inputs = [];
+                for (let i = 0; i < inputQuantidade; i++) {
+                  inputs.push(
+                    <input
+                      key={i}
+                      type="text"
+                      id="interesse"
+                      className="mt-4 w-full bg-neutral-800 text-neutral-100 px-4 py-3 border border-neutral-500 rounded-xl font-poppins text-sm focus:outline-none focus:border-cyan-400"
+                      placeholder="Digite uma tag"
+                      onKeyUp={(e) => {
+                        if (e.key === "Enter") {
+                          const valor = e.target.value.trim().toLowerCase();
+                          if (valor !== "" && !novosInteresses.includes(valor)) {
+                            setNovosInteresses((prev) => [...prev, valor]);
+                            setInputQuantidade((prev) => prev - 1);
+                          }
+                          e.target.value = "";
+                        }
+                      }}
+                    />
+                  );
+                }
+                return inputs;
+              })()
+              }
+            </div>
           </div>
         </div>
       )}

@@ -332,7 +332,7 @@ function Conversas({ conversa, setConversa, setModal }) {
       <p className="font-poppins text-base text-neutral-600 mb-6">Inicie uma nova conversa</p>
       <a 
         onClick={() => setNovaMensagem("mensagem")}
-        className="px-9 py-3 bg-primary-500 text-white rounded-full font-poppins font-semibold cursor-pointer hover:bg-primary-600 transition-colors"
+        className="px-9 py-3 bg-primary-500 text-white rounded-full font-poppins font-semibold cursor-pointer bg-linear-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 shadow-md hover:shadow-lg transition-colors"
       >
         <p>Nova mensagem</p>
       </a>

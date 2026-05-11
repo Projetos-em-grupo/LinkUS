@@ -9,17 +9,17 @@ function Header({ tipo, setTermo }) {
 
   if (tipo === "pagina-inicial" || tipo === "cadastro")
     return (
-      <header className="flex items-center justify-between px-4 md:px-15 py-6 bg-gradient-to-r from-primary-500 to-secondary-500 shadow-lg">
+      <header className="flex items-center justify-between px-4 md:px-15 py-6 bg-linear-to-r from-primary-500 to-secondary-500 shadow-lg">
         <Link to="/">
           <img src="./icons/logo.svg" alt="LinkUS logo" className="h-12 w-auto" />
         </Link>
         <div className="flex gap-4 md:gap-15 items-center mr-4 md:mr-15">
           <Link to="/">
-            <p className="font-lato font-normal text-lg text-white hover:text-neutral-200 transition-colors">Contato</p>
+            <p className="font-lato font-normal text-lg text-black hover:text-cyan-600 transition-colors">Contato</p>
           </Link>
-          <Link to={tipo !== "pagina-inicial" ? "/cadastro" : "/entrar"}>
-            <p className="font-lato font-normal text-lg border-2 border-white rounded-full py-2 px-4 md:px-15 text-white hover:bg-white hover:text-primary-600 transition-colors">
-              {tipo !== "pagina-inicial" ? "Criar conta" : "Entrar"}
+          <Link to={tipo === "pagina-inicial" ? "/cadastro" : "/entrar"}>
+            <p className="font-lato font-normal text-lg border-2 border-cyan-600 rounded-full py-2 px-4 md:px-15 text-black hover:bg-linear-to-r hover:from-cyan-500 hover:to-cyan-600 hover:text-white hover:border-cyan-500 transition-colors">
+              {tipo === "pagina-inicial" ? "Criar conta" : "Entrar"}
             </p>
           </Link>
         </div>

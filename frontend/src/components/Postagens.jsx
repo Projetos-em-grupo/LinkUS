@@ -164,7 +164,7 @@ function Postagens({ termo }) {
           id="foto-perfil"
           src={comentario.url_foto ? comentario.url_foto : "./icons/padrao.svg"}
           alt="Foto do usuário"
-          className="w-10 h-10 rounded-full object-cover flex-shrink-0 mt-2"
+          className="w-10 h-10 rounded-full object-cover shrink-0 mt-2"
         />
         <div className="bg-neutral-200 rounded-3xl px-4 py-3 min-w-96">
           <h2 className="font-poppins font-semibold text-sm">{comentario.nome}</h2>
@@ -211,13 +211,13 @@ function Postagens({ termo }) {
   }
 
   return (
-    <div className="mt-6 h-full max-h-125 overflow-y-auto pr-12">
+    <div className="mt-6 pr-12">
       <div className="bg-neutral-100 rounded-2xl px-5 py-5 flex gap-10 relative mb-8">
         <img
           id="foto-perfil"
           src={usuario?.url_foto ?? "./icons/padrao.svg"}
           alt="Foto do usuário"
-          className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+          className="w-12 h-12 rounded-full object-cover shrink-0"
         />
         <input
           type="text"
@@ -332,6 +332,7 @@ function Postagens({ termo }) {
                       navigate(`/usuario`, {
                         state: postagem,
                       });
+                      else navigate("/perfil");
                   }}
                 >
                   <img
@@ -342,7 +343,7 @@ function Postagens({ termo }) {
                         : "./icons/padrao.svg"
                     }
                     alt={`Foto do usuário ${postagem.nome}`}
-                    className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                    className="w-12 h-12 rounded-full object-cover shrink-0"
                   />
                   <div
                     onClick={(e) => {

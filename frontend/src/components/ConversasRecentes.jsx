@@ -26,7 +26,7 @@ function ConversasRecentes() {
                     mensagem.url_foto ? mensagem.url_foto : "./icons/padrao.svg"
                   }
                   alt="Foto de perfil"
-                  className="w-10 h-10 rounded-full object-cover flex-shrink-0 border-2 border-primary-100"
+                  className="w-10 h-10 rounded-full object-cover shrink-0 border-2 border-primary-100"
                 />
                 <p className="font-lato font-medium text-base text-neutral-700 truncate">{mensagem.nome}</p>
               </li>

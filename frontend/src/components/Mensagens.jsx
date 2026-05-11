@@ -22,26 +22,34 @@ function Mensagens() {
   }, [token, navigate]);
 
   return (
-    <article aria-label="Mensagens" className="min-h-screen bg-neutral-50">
+    <article aria-label="Mensagens" className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
       <Header tipo="logado" setTermo={setTermo} />
-      <div className="grid grid-cols-3 gap-6 px-15 py-6">
-        <Sidebar ativo={"mensagem"} />
-        <MensagensUsuario
-          termo={termo}
-          conversa={conversa}
-          setConversa={setConversa}
-          setModal={setModal}
-          redirec={redirec}
-        />
-        {modal ? (
-          <GrupoInfo grupo={modal} />
-        ) : (
-          <Conversas
-            conversa={conversa}
-            setConversa={setConversa}
-            setModal={setModal}
-          />
-        )}
+      <div className="w-full px-4 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-1">
+            <Sidebar ativo={"mensagem"} />
+          </div>
+          <div className="md:col-span-1">
+            <MensagensUsuario
+              termo={termo}
+              conversa={conversa}
+              setConversa={setConversa}
+              setModal={setModal}
+              redirec={redirec}
+            />
+          </div>
+          <div className="md:col-span-1">
+            {modal ? (
+              <GrupoInfo grupo={modal} />
+            ) : (
+              <Conversas
+                conversa={conversa}
+                setConversa={setConversa}
+                setModal={setModal}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </article>
   );

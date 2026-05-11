@@ -1,10 +1,15 @@
 #grupo-info {
   display: flex;
   flex-direction: column;
-  margin: 32px 48px 0px 0px;
+  margin: 24px 0 0 0;
   height: 480px;
   overflow-y: auto;
   scrollbar-width: none;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 16px;
 }
 
 #grupo-info::-webkit-scrollbar {

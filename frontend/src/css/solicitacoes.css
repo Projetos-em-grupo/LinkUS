@@ -1,32 +1,68 @@
 #solicitacoes {
   margin-top: 24px;
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
 }
 
 #solicitacoes h2 {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  color: #1f2937;
+  font-size: 1.25rem;
+}
+
+#solicitacoes li {
+  padding: 12px;
+  border-radius: 8px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: all 0.2s ease;
+}
+
+#solicitacoes li:hover {
+  background-color: #f9fafb;
 }
 
 #solicitacoes li div {
   display: flex;
   gap: 16px;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 #solicitacoes li div:nth-child(2) {
-  margin-left: 12px;
-  gap: 20px;
+  margin-left: 0;
+  gap: 12px;
 }
 
 #solicitacoes li p {
-  font: 400 1.4rem / 1.3 "Poppins";
+  font: 500 1rem / 1.3 "Poppins";
+  color: #1f2937;
 }
 
 #solicitacoes li a {
   cursor: pointer;
-  padding: 12px 20px;
-  border-radius: 32px;
-  background-color: var(--p7);
-  color: var(--c3);
-  font: 400 1.1rem /1.2 "Poppins";
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #4c7aef, #3563da);
+  color: white;
+  font: 600 0.875rem /1.2 "Poppins";
+  transition: all 0.2s ease;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(76, 122, 239, 0.3);
+}
+
+#solicitacoes li a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(76, 122, 239, 0.4);
+}
+
+#solicitacoes li img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #e1e9f7;
+  object-fit: cover;
+  flex-shrink: 0;
 }

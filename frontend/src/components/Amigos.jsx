@@ -9,12 +9,20 @@ function Amigos() {
   const [conversa, setConversa] = useState(null);
 
   return (
-    <article aria-label="Amigos" className="min-h-screen bg-neutral-50">
+    <article aria-label="Amigos" className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
       <Header tipo="logado" setTermo={setTermo} />
-      <div className="grid grid-cols-3 gap-6 px-15 py-6">
-        <Sidebar ativo={"amigos"} />
-        <AmigosUsuario termo={termo} setConversa={setConversa} />
-        <Solicitacoes conversa={conversa} />
+      <div className="w-full px-4 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-1">
+            <Sidebar ativo={"amigos"} />
+          </div>
+          <div className="md:col-span-1">
+            <AmigosUsuario termo={termo} setConversa={setConversa} />
+          </div>
+          <div className="md:col-span-1">
+            <Solicitacoes conversa={conversa} />
+          </div>
+        </div>
       </div>
     </article>
   );

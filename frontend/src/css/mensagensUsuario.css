@@ -3,6 +3,11 @@
   overflow-y: auto;
   max-height: 78vh;
   scrollbar-width: none;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 8px;
 }
 
 #mensagens-usuario::-webkit-scrollbar {
@@ -10,20 +15,56 @@
 }
 
 #conversa-atual {
-  background-color: var(--c1);
+  background-color: #f0f4fb;
+  border-left: 4px solid #4c7aef;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(76, 122, 239, 0.1);
 }
 
 #mensagens-usuario li {
-  padding: 24px 40px;
-  border-radius: 20px;
-  margin-right: 60px;
+  padding: 16px 16px;
+  border-radius: 8px;
+  margin-right: 0;
   display: flex;
   gap: 12px;
-  font: 300 1.2rem / 1.3 "Poppins";
-  margin-bottom: 24px;
+  font: 300 1rem / 1.3 "Poppins";
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+#mensagens-usuario li:hover {
+  background-color: #f9fafb;
+  border-color: #e1e9f7;
+  padding-left: 20px;
 }
 
 #mensagens-usuario li div {
   display: flex;
   flex-direction: column;
+  width: 100%;
+}
+
+#mensagens-usuario li img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #e1e9f7;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+#mensagens-usuario li p:first-child {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 2px;
+}
+
+#mensagens-usuario li p:last-child {
+  color: #6b7280;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

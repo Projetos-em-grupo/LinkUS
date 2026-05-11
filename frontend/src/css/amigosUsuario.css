@@ -1,11 +1,35 @@
 #amigos-usuario {
   margin-top: 24px;
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
 }
 
 #amigos-usuario li {
   display: flex;
   align-items: center;
   gap: 20px;
-  font: 500 1.4rem / 1.2 "Poppins";
-  margin-bottom: 20px;
+  font: 500 1rem / 1.4 "Poppins";
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+#amigos-usuario li:hover {
+  background-color: #f9fafb;
+  border-color: #e1e9f7;
+}
+
+#amigos-usuario li img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #e1e9f7;
+  object-fit: cover;
+  flex-shrink: 0;
 }
