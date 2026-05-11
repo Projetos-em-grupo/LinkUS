@@ -5,7 +5,6 @@ import { ptBR } from "date-fns/locale";
 import { useAutenticador } from "./providers/useAutenticador";
 import { usePostagens } from "./providers/usePostagens";
 import { createClient } from "@supabase/supabase-js";
-import "../css/postagens.css";
 import Loading from "./Loading";
 import { useConexao } from "./providers/useConexao";
 
@@ -160,16 +159,17 @@ function Postagens({ termo }) {
 
   function Comentario({ comentario, post }) {
     return (
-      <div id="comentario">
+      <div className="flex gap-6 mb-5">
         <img
           id="foto-perfil"
           src={comentario.url_foto ? comentario.url_foto : "./icons/padrao.svg"}
           alt="Foto do usuário"
+          className="w-10 h-10 rounded-full object-cover flex-shrink-0 mt-2"
         />
-        <div>
-          <h2>{comentario.nome}</h2>
-          <p>{comentario.conteudo}</p>
-          <div>
+        <div className="bg-neutral-200 rounded-3xl px-4 py-3 min-w-96">
+          <h2 className="font-poppins font-semibold text-sm">{comentario.nome}</h2>
+          <p className="font-poppins text-base">{comentario.conteudo}</p>
+          <div className="flex gap-4 mt-3">
             <img
               onClick={async () => interagirPostagem(post, "like", comentario)}
               src={
@@ -178,9 +178,9 @@ function Postagens({ termo }) {
                   : "./icons/like.svg"
               }
               alt="Ícone de like"
-              className="interacao"
+              className="cursor-pointer w-5 h-5 hover:scale-110 transition-transform"
             />
-            <p>{comentario.positivas}</p>
+            <p className="text-xs font-poppins">{comentario.positivas}</p>
             <img
               onClick={async () =>
                 interagirPostagem(post, "dislike", comentario)
@@ -190,10 +190,10 @@ function Postagens({ termo }) {
                   ? "./icons/dislike-dado.svg"
                   : "./icons/dislike.svg"
               }
-              alt="Ícone de like"
-              className="interacao"
+              alt="Ícone de dislike"
+              className="cursor-pointer w-5 h-5 hover:scale-110 transition-transform"
             />
-            <p>{comentario.negativas}</p>
+            <p className="text-xs font-poppins">{comentario.negativas}</p>
           </div>
         </div>
       </div>
@@ -202,7 +202,7 @@ function Postagens({ termo }) {
 
   function ListarComentarios({ comentarios, post }) {
     return (
-      <div>
+      <div className="mt-6">
         {comentarios.map((c) => (
           <Comentario key={c.id_comentario} comentario={c} post={post} />
         ))}
@@ -211,17 +211,19 @@ function Postagens({ termo }) {
   }
 
   return (
-    <div id="postagens">
-      <div id="novo-post" className="conteudo">
+    <div className="mt-6 h-full max-h-125 overflow-y-auto pr-12">
+      <div className="bg-neutral-100 rounded-2xl px-5 py-5 flex gap-10 relative mb-8">
         <img
           id="foto-perfil"
           src={usuario?.url_foto ?? "./icons/padrao.svg"}
           alt="Foto do usuário"
+          className="w-12 h-12 rounded-full object-cover flex-shrink-0"
         />
         <input
           type="text"
           id="novo-post-input"
           placeholder="Digite o que está pensando..."
+          className="flex-1 bg-neutral-200 rounded-full px-6 py-3 text-base font-poppins border-none focus:outline-none focus:ring-2 focus:ring-primary-500"
           onKeyUp={async (e) => {
             if (e.key === "Enter") {
               const info = {};
@@ -291,8 +293,12 @@ function Postagens({ termo }) {
             }
           }}
         />
-        <div>
-          {midia && <p id="file-name">{midia.conteudo.name}</p>}
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3">
+          {midia && (
+            <p className="px-2 py-1 bg-neutral-300 rounded-full text-xs font-poppins">
+              {midia.conteudo.name}
+            </p>
+          )}
           <input
             type="file"
             id="midia"
@@ -305,23 +311,21 @@ function Postagens({ termo }) {
               else setMidia({ tipo: "imagem", conteudo: arquivo });
             }}
           />
-          <label htmlFor="midia" className="interacao">
-            <img src="./icons/enviar.svg" alt="Ícone de adicionar mídia" />
+          <label htmlFor="midia" className="cursor-pointer hover:opacity-80 transition-opacity">
+            <img src="./icons/enviar.svg" alt="Ícone de adicionar mídia" className="w-6 h-6" />
           </label>
         </div>
       </div>
-      <ul>
+      <ul className="space-y-6">
         {postagensFiltradas &&
           postagensFiltradas.map((postagem) => {
             return postagem === undefined ? null : (
               <li
                 key={postagem.id_postagem}
-                className="conteudo"
-                id="conteudo-post"
+                className="bg-neutral-100 rounded-2xl p-5"
               >
                 <div
-                  id="post"
-                  style={{ cursor: "pointer" }}
+                  className="flex gap-5 items-start cursor-pointer mb-4 hover:opacity-80 transition-opacity"
                   onClick={(e) => {
                     e.stopPropagation();
                     if (postagem.nome !== usuario.nome)
@@ -338,9 +342,9 @@ function Postagens({ termo }) {
                         : "./icons/padrao.svg"
                     }
                     alt={`Foto do usuário ${postagem.nome}`}
+                    className="w-12 h-12 rounded-full object-cover flex-shrink-0"
                   />
                   <div
-                    id="info"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (
@@ -353,10 +357,10 @@ function Postagens({ termo }) {
                           state: postagem,
                         });
                     }}
-                    style={{ cursor: "pointer" }}
+                    className="cursor-pointer"
                   >
-                    <h2>{postagem.nome}</h2>
-                    <p>
+                    <h2 className="font-lato font-semibold text-base">{postagem.nome}</h2>
+                    <p className="font-poppins text-xs text-neutral-600">
                       {formatDistanceToNow(new Date(postagem.data_criacao), {
                         addSuffix: true,
                         locale: ptBR,
@@ -364,50 +368,51 @@ function Postagens({ termo }) {
                     </p>
                   </div>
                 </div>
-                <p>{postagem.texto}</p>
+                <p className="font-poppins text-sm mb-4">{postagem.texto}</p>
                 {postagem.tipo_conteudo === "imagem" && (
-                  <img src={postagem.url_midia} id="imagem-post" />
+                  <img src={postagem.url_midia} alt="Post imagem" className="w-full max-w-2xl max-h-96 rounded-lg object-cover mb-4" />
                 )}
 
                 {postagem.tipo_conteudo === "video" && (
-                  <video controls width="500" id="video-post">
+                  <video controls width="500" className="w-full max-w-2xl rounded-lg mb-4">
                     <source src={postagem.url_midia} type="video/mp4" />
                   </video>
                 )}
-                <ul>
-                  <li>
+                <div className="border-t-2 border-neutral-300 pt-4 mt-4 flex gap-5">
+                  <div className="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity">
                     <img
                       onClick={() => interagirPostagem(postagem, "like", null)}
-                      className="interacao"
                       src={
                         postagem.interacao && postagem.interacao === "like"
                           ? "./icons/like-dado.svg"
                           : "./icons/like.svg"
                       }
                       alt="Ícone de like"
+                      className="w-6 h-6"
                     />
-                    <p>{postagem.positivas}</p>
-                  </li>
-                  <li>
+                    <p className="font-poppins text-sm">{postagem.positivas}</p>
+                  </div>
+                  <div className="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity">
                     <img
                       onClick={() =>
                         interagirPostagem(postagem, "dislike", null)
                       }
-                      className="interacao"
                       src={
                         postagem.interacao && postagem.interacao === "dislike"
                           ? "./icons/dislike-dado.svg"
                           : "./icons/dislike.svg"
                       }
                       alt="Ícone de dislike"
+                      className="w-6 h-6"
                     />
-                    <p>{postagem.negativas}</p>
-                  </li>
-                  <li id="novo-comentario">
+                    <p className="font-poppins text-sm">{postagem.negativas}</p>
+                  </div>
+                  <div className="ml-auto flex-1 max-w-lg">
                     <input
                       id={postagem.id_postagem + "-comentario"}
                       type="text"
                       placeholder="comente algo"
+                      className="w-full bg-neutral-200 rounded-full px-4 py-2 text-xs font-poppins border-none focus:outline-none focus:ring-2 focus:ring-primary-500"
                       onKeyUp={async (e) => {
                         if (e.key === "Enter" && e.target.value) {
                           const data = {};
@@ -441,8 +446,8 @@ function Postagens({ termo }) {
                         }
                       }}
                     />
-                  </li>
-                </ul>
+                  </div>
+                </div>
                 <ListarComentarios
                   comentarios={postagem.comentarios}
                   post={postagem}

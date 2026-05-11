@@ -1,2 +1,89 @@
-@import "./color.css";
-@import "./global.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Reset and base styles */
+  p, h1, h2, h3, h4, ul, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  li {
+    list-style: none;
+  }
+
+  /* Font families */
+  body {
+    font-family: 'Poppins', sans-serif;
+    color: #111827; /* text-gray-900 */
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Lato', sans-serif;
+  }
+}
+
+@layer components {
+  /* Global utility classes */
+  .modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 50;
+  }
+
+  .modal-content {
+    width: 40%;
+    background-color: #111827; /* neutral-900 */
+    margin: 6% auto;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    max-height: 80vh;
+  }
+
+  #temporario {
+    left: 50%;
+    transform: translateX(-50%);
+    animation: fade-in 0.5s ease-in-out;
+  }
+
+  .barra-progresso {
+    height: 0.25rem;
+    width: 100%;
+    background-color: #f3f4f6; /* neutral-100 */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transform-origin: left;
+    animation: progress-drain 3s ease-in-out;
+  }
+
+  .container {
+    margin-left: 15rem;
+    margin-right: 15rem;
+  }
+}
+
+#foto-perfil {
+  border-radius: 9999px;
+  width: 3.75rem;
+  height: 3.75rem;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  scrollbar-width: none;
+}

@@ -22,9 +22,9 @@ function Mensagens() {
   }, [token, navigate]);
 
   return (
-    <article aria-label="Mensagens">
+    <article aria-label="Mensagens" className="min-h-screen bg-neutral-50">
       <Header tipo="logado" setTermo={setTermo} />
-      <div>
+      <div className="grid grid-cols-3 gap-6 px-15 py-6">
         <Sidebar ativo={"mensagem"} />
         <MensagensUsuario
           termo={termo}

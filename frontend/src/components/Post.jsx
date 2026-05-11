@@ -7,7 +7,6 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import Postagens from "./Postagens";
 import ConversasRecentes from "./ConversasRecentes";
-import "../css/post.css";
 
 function Post() {
   const navigate = useNavigate();
@@ -43,9 +42,9 @@ function Post() {
   }, [usuario, acharUsuarioInfo]);
 
   return (
-    <article aria-label="postagens" id="postagens-article">
+    <article aria-label="postagens" className="min-h-screen bg-neutral-50">
       <Header tipo="logado" setTermo={setTermo} />
-      <div>
+      <div className="grid grid-cols-3 gap-6 px-15 py-6">
         <Sidebar ativo="home" />
         <Postagens termo={termo} />
         <ConversasRecentes />

@@ -9,9 +9,9 @@ function Amigos() {
   const [conversa, setConversa] = useState(null);
 
   return (
-    <article aria-label="Amigos">
+    <article aria-label="Amigos" className="min-h-screen bg-neutral-50">
       <Header tipo="logado" setTermo={setTermo} />
-      <div>
+      <div className="grid grid-cols-3 gap-6 px-15 py-6">
         <Sidebar ativo={"amigos"} />
         <AmigosUsuario termo={termo} setConversa={setConversa} />
         <Solicitacoes conversa={conversa} />
