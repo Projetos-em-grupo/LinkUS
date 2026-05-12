@@ -32,7 +32,7 @@ function GrupoInfo({ grupo }) {
 
       acharParticipantes();
     }
-  }, [grupo, atualizarGrupo]);
+  }, [grupo, atualizarGrupo, token]);
   return (
     <div id="grupo-info">
       <span>

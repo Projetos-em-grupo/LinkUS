@@ -9,7 +9,7 @@ function Header({ tipo, setTermo }) {
 
   if (tipo === "pagina-inicial" || tipo === "cadastro")
     return (
-      <header className="flex items-center justify-between px-4 md:px-15 py-6 bg-linear-to-r from-primary-500 to-secondary-500 shadow-lg">
+      <header className="flex items-center justify-between px-4 md:px-15 py-6 bg-white shadow-lg">
         <Link to="/">
           <img src="./icons/logo.svg" alt="LinkUS logo" className="h-12 w-auto" />
         </Link>
@@ -39,24 +39,24 @@ function Header({ tipo, setTermo }) {
           placeholder="use # para interesses @ para pessoas"
           id="search"
           onChange={(e) => setTermo(e.target.value)}
-          className="w-full h-14 px-4 md:px-20 py-3 text-base font-poppins border border-neutral-300 rounded-full bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+          className="w-full h-12 px-4 md:px-20 py-3 text-base font-poppins border border-neutral-300 rounded-full bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
         />
         <img 
           src="./icons/pesquisa.svg" 
           alt="Ícone de pesquisa" 
-          className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-6 md:w-12 h-6 md:h-12 cursor-pointer"
+          className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-6 md:w-9 h-6 md:h-9 cursor-pointer"
         />
       </div>
       <div className="flex gap-4 md:gap-6 items-center ml-4 md:ml-6">
-        <Link to="/mensagem" className="hover:opacity-80 transition-opacity p-2 rounded-full hover:bg-neutral-100">
-          <img src="./icons/conversa.svg" alt="Ícone de conversas" className="w-8 md:w-12 h-8 md:h-12" />
+        <Link to="/mensagem" className="hover:opacity-80 transition-opacity p-2 rounded-full hover:bg-neutral-100 cursor-pointer">
+          <img src="./icons/conversa.svg" alt="Ícone de conversas" className="w-6 md:w-9 h-6 md:h-9" />
         </Link>
-        <Link to="/perfil" className="hover:opacity-80 transition-opacity p-2 rounded-full hover:bg-neutral-100">
+        <Link to="/perfil" className="hover:opacity-80 transition-opacity p-2 rounded-full hover:bg-neutral-100 cursor-pointer">
           <img
             id="foto-perfil"
             src={usuario.url_foto || "./icons/perfil.svg"}
             alt="Ícone de perfil"
-            className="w-8 md:w-12 h-8 md:h-12 rounded-full object-cover border-2 border-primary-200"
+            className="w-6 md:w-9 h-6 md:h-9 rounded-full object-cover border-2 border-neutral-800"
           />
         </Link>
         <button
@@ -64,12 +64,12 @@ function Header({ tipo, setTermo }) {
             navigate("/");
             logout();
           }}
-          className="hover:opacity-80 transition-opacity p-2 rounded-full hover:bg-neutral-100"
+          className="hover:opacity-80 transition-opacity p-2 rounded-full hover:bg-neutral-100 cursor-pointer"
         >
           <img
             src="./icons/logout.svg"
             alt="Ícone para sair da sua conta"
-            className="w-8 md:w-12 h-8 md:h-12"
+            className="w-6 md:w-9 h-6 md:h-9"
           />
         </button>
       </div>

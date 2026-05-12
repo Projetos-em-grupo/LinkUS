@@ -85,12 +85,6 @@
   }
 }
 
-#foto-perfil {
-  border-radius: 9999px;
-  width: 3.75rem;
-  height: 3.75rem;
-}
-
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   display: none;

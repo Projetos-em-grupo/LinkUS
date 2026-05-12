@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { ConexaoContext } from "./useConexao";
 import { useAutenticador } from "./useAutenticador";
 
 export function ConexoesProvider({ children }) {
   const { token } = useAutenticador();
   const [conexoesUsuarioLoading, setConexoesUsuarioLoading] = useState(true);
-  const [conexoesUsuario, setConexoesUsuario] = useState(null);
+  const [conexoesUsuario, setConexoesUsuario] = useState([]);
 
-  async function acharConexoesPorUsuario(nome) {
+  const acharConexoesPorUsuario = useCallback(async (nome) => {
     setConexoesUsuarioLoading(true);
     try {
       const result = await fetch(
@@ -27,7 +27,7 @@ export function ConexoesProvider({ children }) {
     } finally {
       setConexoesUsuarioLoading(false);
     }
-  }
+  }, [token]);
 
   return (
     <ConexaoContext.Provider

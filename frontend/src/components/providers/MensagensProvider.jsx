@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { MensagensContext } from "./useMensagens";
 import { useAutenticador } from "./useAutenticador";
 
@@ -8,7 +8,7 @@ export function MensagensProvider({ children }) {
   const [mensagensUsuarioLoading, setMensagensUsuarioLoading] = useState(true);
   const [mensagensUsuario, setMensagensUsuario] = useState(null);
 
-  async function acharMensagensPorUsuario(email) {
+  const acharMensagensPorUsuario = useCallback(async (email) => {
     setMensagensUsuarioLoading(true);
     try {
       const result = await fetch(
@@ -32,7 +32,7 @@ export function MensagensProvider({ children }) {
     } finally {
       setMensagensUsuarioLoading(false);
     }
-  }
+  }, [token]);
 
   return (
     <MensagensContext.Provider

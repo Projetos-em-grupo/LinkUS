@@ -15,14 +15,14 @@ function PostagensOutroUsuario({ outroUsuario }) {
 
   useEffect(() => {
     if (usuario) acharConexoesPorUsuario(usuario.nome);
-  }, [usuario]);
+  }, [usuario, acharConexoesPorUsuario]);
 
   useEffect(() => {
     if (outroUsuario.nome && !jaCarregou) {
       acharPostagensPorUsuario(outroUsuario.nome);
       setJaCarregou(true);
     }
-  }, [outroUsuario]);
+  }, [outroUsuario, jaCarregou, acharPostagensPorUsuario]);
 
   async function enviarSolicitacao(destinatario) {
     const data = {};
@@ -162,7 +162,7 @@ function PostagensOutroUsuario({ outroUsuario }) {
           ) && (
             <a
               onClick={() => {
-                navigate("/mensagem", { state: outroUsuario });
+                navigate("/mensagem", { state: { ...outroUsuario, tipo: "privada" } });
               }}
             >
               Enviar mensagem

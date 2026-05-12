@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useConexao } from "./providers/useConexao";
 import { useAutenticador } from "./providers/useAutenticador";
+import { useMensagens } from "./providers/useMensagens";
+import { useGrupos } from "./providers/useGrupos";
 import Erro from "./Erro";
 
 function Conversas({ conversa, setConversa, setModal }) {
@@ -11,11 +13,26 @@ function Conversas({ conversa, setConversa, setModal }) {
   const [mensagens, setMensagens] = useState(null);
   const { acharConexoesPorUsuario, conexoesUsuario, conexoesUsuarioLoading } =
     useConexao();
+  const { mensagensUsuario } = useMensagens();
+  const { acharGruposPorUsuario } = useGrupos();
   const [atualizarMensagens, setAtualizarMensagens] = useState(false);
   const [novosIntegrantes, setNovosIntegrantes] = useState([]);
   const [novoGrupo, setNovoGrupo] = useState({});
   const [modalMensagem, setModalMensagem] = useState();
   const [modalErro, setModalErro] = useState(null);
+  const [podeCriarGrupo, setPodeCriarGrupo] = useState(true);
+  const bottomRef = useRef(null);
+
+  function abrirConversaPrivada(conexao) {
+    if (!conexao) return;
+
+    const existente = mensagensUsuario?.find(
+      (mensagem) => mensagem.nome === conexao.nome && mensagem.tipo === "privada"
+    );
+
+    setConversa(existente ?? { ...conexao, tipo: "privada" });
+    setNovaMensagem(false);
+  }
 
   async function criarGrupo() {
     const data = {
@@ -62,6 +79,15 @@ function Conversas({ conversa, setConversa, setModal }) {
         }
       }
 
+      const grupoConversa = {
+        nome: novoGrupo.nome,
+        descricao: novoGrupo.descricao,
+        tipo: "grupo",
+      };
+
+      setConversa(grupoConversa);
+      setModal(null);
+      if (acharGruposPorUsuario) acharGruposPorUsuario(usuario.nome);
       setNovoGrupo({});
       setNovosIntegrantes([]);
       setNovaMensagem(false);
@@ -125,7 +151,7 @@ function Conversas({ conversa, setConversa, setModal }) {
 
   useEffect(() => {
     if (usuario) acharConexoesPorUsuario(usuario.nome);
-  }, [usuario]);
+  }, [usuario, acharConexoesPorUsuario]);
 
   useEffect(() => {
     if (conversa) {
@@ -150,58 +176,72 @@ function Conversas({ conversa, setConversa, setModal }) {
 
       acharMensagens();
     }
-  }, [conversa, atualizarMensagens]);
+  }, [conversa, atualizarMensagens, token, usuario?.nome]);
 
   useEffect(() => {
-    const mensagens_atuais = document.getElementById("conteudo-conversa");
-    if (mensagens_atuais)
-      mensagens_atuais.scrollTop = mensagens_atuais.scrollHeight;
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    } else {
+      const mensagens_atuais = document.getElementById("conteudo-conversa");
+      if (mensagens_atuais)
+        mensagens_atuais.scrollTop = mensagens_atuais.scrollHeight;
+    }
   }, [mensagens]);
 
   if (modalErro)
     return <Erro mensagem={modalErro} setModalErro={setModalErro} />;
 
   return conversa ? (
-    <div id="mensagens-atuais" onClick={() => setModalMensagem(null)} className="flex flex-col h-full max-h-125 overflow-y-auto">
-      <div className="border-b border-neutral-300 pb-4 mb-4">
-        <div className="flex gap-4 items-center justify-between">
-          <div className="flex items-center gap-4">
-            <img
-              id="foto-perfil"
-              src={conversa.url_foto || "./icons/padrao.svg"}
-              alt="Foto de perfil da conversa"
-              className="w-12 h-12 rounded-full object-cover"
-            />
-            <p className="font-poppins font-semibold">@{conversa.nome}</p>
+    <div className="flex flex-col h-full min-h-[70vh] bg-white rounded-2xl shadow-sm border border-neutral-200 overflow-hidden">
+      <div className="flex items-center justify-between p-4 border-b border-neutral-200 bg-neutral-50">
+        <div className="flex items-center gap-3">
+          <img
+            src={conversa.url_foto || "./icons/padrao.svg"}
+            alt="Foto de perfil da conversa"
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <div>
+            <p className="font-poppins font-semibold text-neutral-800">@{conversa.nome}</p>
+            {conversa.tipo === "grupo" && (
+              <p className="font-poppins text-xs text-neutral-500">Grupo</p>
+            )}
           </div>
+        </div>
+        <div className="flex items-center gap-2">
           {conversa.tipo === "grupo" && (
-            <img
-              src="./icons/info.svg"
-              alt="Ícone de informações da conversa"
-              className="cursor-pointer hover:opacity-80 transition-opacity w-6 h-6"
-              onClick={() => {
-                setModal(conversa);
-              }}
-            />
+            <button
+              onClick={() => setModal(conversa)}
+              className="p-2 hover:bg-neutral-200 rounded-full transition-colors"
+            >
+              <img
+                src="./icons/info.svg"
+                alt="Ícone de informações da conversa"
+                className="w-5 h-5"
+              />
+            </button>
           )}
+          <button
+            onClick={() => setConversa(null)}
+            className="p-2 hover:bg-neutral-200 rounded-full transition-colors"
+          >
+            <img
+              src="./icons/fechar_black.svg"
+              alt="Ícone de fechar conversa"
+              className="w-5 h-5 cursor-pointer hover:opacity-70 transition-opacity"
+            />
+          </button>
         </div>
       </div>
-      <ul id="conteudo-conversa" className="flex-1 overflow-y-auto space-y-3 mb-4">
+
+      <div className="flex-1 overflow-y-auto p-4 space-y-4" id="conteudo-conversa">
         {mensagens &&
           mensagens.map((mensagem) => {
+            const isOwnMessage = mensagem.nome_remetente === usuario.nome;
             return (
-              <li
+              <div
                 key={mensagem.id_mensagem}
-                className={`flex ${
-                  mensagem.nome_remetente === usuario.nome
-                    ? "justify-end"
-                    : "justify-start"
-                }`}
-                id={
-                  mensagem.id_mensagem === modalMensagem?.id_mensagem
-                    ? "modal"
-                    : ""
-                }
+                className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
+                id={mensagem.id_mensagem === modalMensagem?.id_mensagem ? "modal" : ""}
                 onClick={(e) => {
                   e.stopPropagation();
                   setModalMensagem(mensagem);
@@ -210,7 +250,7 @@ function Conversas({ conversa, setConversa, setModal }) {
                 <div className="relative max-w-xs">
                   {modalMensagem?.id_mensagem === mensagem.id_mensagem && (
                     <div
-                      className="absolute -top-8 left-0 bg-danger flex gap-2 px-3 py-2 rounded-lg cursor-pointer hover:opacity-80 transition-opacity z-10"
+                      className="absolute -top-12 left-0 bg-red-500 text-white flex gap-2 px-3 py-2 rounded-lg cursor-pointer hover:bg-red-600 transition-colors z-10 shadow-lg"
                       onClick={async (e) => {
                         e.stopPropagation();
                         if (conversa.tipo === "grupo") {
@@ -234,8 +274,7 @@ function Conversas({ conversa, setConversa, setModal }) {
 
                           if (res.status !== 200)
                             setModalErro(
-                              "Erro ao tentar excluir a mensagem: " +
-                                (await res.text())
+                              "Erro ao tentar excluir a mensagem: " + (await res.text())
                             );
                           else setAtualizarMensagens((val) => !val);
                         } else {
@@ -259,36 +298,35 @@ function Conversas({ conversa, setConversa, setModal }) {
 
                           if (res.status !== 200)
                             setModalErro(
-                              "Erro ao tentar excluir a mensagem: " +
-                                (await res.text())
+                              "Erro ao tentar excluir a mensagem: " + (await res.text())
                             );
                           else setAtualizarMensagens((val) => !val);
                         }
                       }}
                     >
                       <img src="./icons/lixeira.svg" alt="Ícone de lixeira" className="w-4 h-4" />
-                      <p className="text-xs text-white font-poppins">Excluir</p>
+                      <p className="text-xs font-poppins">Excluir</p>
                     </div>
                   )}
-                  <div className={`px-4 py-3 rounded-3xl ${
-                    mensagem.nome_remetente === usuario.nome
-                      ? "bg-primary-500 text-white rounded-br-none"
-                      : "bg-neutral-200 text-neutral-900 rounded-bl-none"
+
+                  <div className={`px-4 py-3 rounded-2xl shadow-sm ${
+                    isOwnMessage
+                      ? "bg-cyan-500 text-white rounded-br-md"
+                      : "bg-neutral-100 text-neutral-900 rounded-bl-md"
                   }`}>
                     <p className="font-poppins text-sm">{mensagem.texto}</p>
                   </div>
-                  <div className={`flex gap-2 mt-1 text-xs font-poppins ${
-                    mensagem.nome_remetente === usuario.nome
-                      ? "justify-end text-neutral-600"
-                      : "justify-start text-neutral-600"
+
+                  <div className={`flex items-center gap-2 mt-2 text-xs font-poppins ${
+                    isOwnMessage ? "justify-end" : "justify-start"
                   }`}>
-                    <p>
+                    <p className="text-neutral-500">
                       {formatDistanceToNow(new Date(mensagem.data_envio), {
                         addSuffix: true,
                         locale: ptBR,
                       })}
                     </p>
-                    {mensagem.nome_remetente === usuario.nome && (
+                    {isOwnMessage && (
                       <img
                         src={
                           mensagem.status === "visualizado"
@@ -297,168 +335,287 @@ function Conversas({ conversa, setConversa, setModal }) {
                               ? "./icons/entregue.svg"
                               : "./icons/enviado.svg"
                         }
-                        alt={`Status de visualização: ${mensagem.status}`}
+                        alt={`Status: ${mensagem.status}`}
                         className="w-4 h-4"
                       />
                     )}
                   </div>
                 </div>
-              </li>
+              </div>
             );
           })}
-      </ul>
-      <div className="flex gap-3 items-center border-t border-neutral-300 pt-4 relative">
-        <input
-          type="text"
-          placeholder="digite uma mensagem"
-          className="flex-1 bg-neutral-200 rounded-full px-4 py-3 font-poppins text-sm border-none focus:outline-none focus:ring-2 focus:ring-primary-500"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              enviarMensagem(e.target.value);
-              e.target.value = "";
-            }
-          }}
-        />
-        <img
-          src="./icons/enviarSolicitacao.svg"
-          alt="Ícone de enviar mensagem"
-          className="w-6 h-6 cursor-pointer hover:opacity-80 transition-opacity"
-        />
+        <div ref={bottomRef} className="h-0 w-0" />
+      </div>
+
+      <div className="p-4 border-t border-neutral-200 bg-neutral-50">
+        <div className="flex gap-3 items-center">
+          <input
+            type="text"
+            placeholder="Digite uma mensagem..."
+            className="cursor-pointer flex-1 bg-white border border-neutral-200 rounded-full px-4 py-3 font-poppins text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && e.target.value.trim()) {
+                enviarMensagem(e.target.value.trim());
+                e.target.value = "";
+              }
+            }}
+          />
+          <button
+            onClick={(e) => {
+              const input = e.currentTarget.previousElementSibling;
+              if (input.value.trim()) {
+                enviarMensagem(input.value.trim());
+                input.value = "";
+              }
+            }}
+            className="p-3 bg-cyan-500 hover:bg-cyan-600 rounded-full transition-colors shadow-md hover:shadow-lg"
+          >
+            <img
+              src="./icons/enviarSolicitacao.svg"
+              alt="Ícone de enviar mensagem"
+              className="w-5 h-5"
+            />
+          </button>
+        </div>
       </div>
     </div>
   ) : (
-    <div className="mt-24 flex flex-col items-center justify-center">
-      <h2 className="font-lato font-semibold text-3xl mb-4">Selecione uma mensagem</h2>
-      <p className="font-poppins text-base text-neutral-600 mb-6">Inicie uma nova conversa</p>
-      <a 
+    <div className="flex flex-col items-center justify-center h-full bg-neutral-50 rounded-2xl p-8">
+      <div className="text-center mb-8">
+        <div className="w-24 h-24 bg-cyan-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <img src="./icons/mensagem.svg" alt="Ícone de mensagem" className="w-12 h-12" />
+        </div>
+        <h2 className="font-lato font-semibold text-2xl text-neutral-800 mb-3">
+          Nenhuma conversa selecionada
+        </h2>
+        <p className="font-poppins text-neutral-600 max-w-sm">
+          Escolha uma conversa existente ou inicie uma nova para começar a conversar
+        </p>
+      </div>
+
+      <button
         onClick={() => setNovaMensagem("mensagem")}
-        className="px-9 py-3 bg-primary-500 text-white rounded-full font-poppins font-semibold cursor-pointer bg-linear-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 shadow-md hover:shadow-lg transition-colors"
+        className="cursor-pointer px-8 py-4 bg-cyan-500 text-white rounded-full font-poppins font-semibold hover:bg-cyan-600 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3"
       >
-        <p>Nova mensagem</p>
-      </a>
+        <img src="./icons/mais.svg" alt="Ícone de adicionar" className="w-6 h-6" />
+        <span>Nova Conversa</span>
+      </button>
       {novaMensagem == "mensagem" && !conexoesUsuarioLoading && (
         <div
-          className="modal"
-          id="modal-mensagem"
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
           onClick={() => setNovaMensagem(false)}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center gap-3 mb-6">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-lato font-semibold text-xl text-neutral-800">Nova Conversa</h2>
               <img
-                src="./icons/fechar.svg"
-                alt="Ícone de fechar aba de criar grupo"
+                src="./icons/fechar_black.svg"
+                alt="Ícone de fechar"
                 onClick={() => setNovaMensagem(false)}
-                className="w-6 h-6 cursor-pointer"
+                className="w-6 h-6 cursor-pointer hover:opacity-70 transition-opacity"
               />
-              <h2 className="font-lato font-semibold text-xl text-neutral-200">Nova mensagem</h2>
             </div>
-            <ul className="space-y-3">
-              <li 
+
+            <div className="space-y-2">
+              <div
                 onClick={() => setNovaMensagem("grupo")}
-                className="flex gap-4 items-center p-3 hover:bg-neutral-800 rounded-lg cursor-pointer transition-colors"
+                className="flex items-center gap-4 p-4 hover:bg-neutral-50 rounded-lg cursor-pointer transition-colors group"
               >
-                <img src="./icons/grupos.svg" alt="Ícone para criar grupo" className="w-6 h-6" />
-                <p className="font-poppins text-neutral-200">Criar grupo</p>
-              </li>
+                <div className="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center group-hover:bg-cyan-200 transition-colors">
+                  <img src="./icons/grupos.svg" alt="Ícone para criar grupo" className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="font-poppins font-medium text-neutral-800">Criar grupo</p>
+                  <p className="font-poppins text-sm text-neutral-500">Inicie uma conversa em grupo</p>
+                </div>
+              </div>
+
               {conexoesUsuario.map((conexao) => (
-                <li
+                <div
                   key={conexao.nome}
                   onClick={() => {
-                    setConversa(conexao);
+                    abrirConversaPrivada(conexao);
                   }}
-                  className="flex gap-4 items-center p-3 hover:bg-neutral-800 rounded-lg cursor-pointer transition-colors"
+                  className="flex items-center gap-4 p-4 hover:bg-neutral-50 rounded-lg cursor-pointer transition-colors"
                 >
                   <img
                     src={conexao.url_foto || "./icons/padrao.svg"}
                     alt="Foto de perfil do usuário"
-                    className="w-10 h-10 rounded-full object-cover"
+                    className="w-12 h-12 rounded-full object-cover"
                   />
-                  <p className="font-poppins text-neutral-200">@{conexao.nome}</p>
-                </li>
+                  <div>
+                    <p className="font-poppins font-medium text-neutral-800">@{conexao.nome}</p>
+                    <p className="font-poppins text-sm text-neutral-500">Iniciar conversa privada</p>
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         </div>
       )}
       {novaMensagem === "grupo" && (
         <div
-          className="modal"
-          id="modal-mensagem"
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
           onClick={() => setNovaMensagem(false)}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-lato font-semibold text-xl text-neutral-800">Novo Grupo</h2>
               <img
                 src="./icons/fechar.svg"
-                alt="Ícone de fechar aba de criar grupo"
+                alt="Ícone de fechar"
                 onClick={() => setNovaMensagem(false)}
+                className="w-6 h-6 cursor-pointer hover:opacity-70 transition-opacity"
               />
-              <h2>Novo grupo</h2>
-              <a
-                onClick={() => {
-                  if (novosIntegrantes) setNovaMensagem("grupo-detalhes");
-                }}
-              >
-                Próximo
-              </a>
             </div>
-            <h2>Selecione os participantes</h2>
-            <ul>
-              {conexoesUsuario.map((conexao) => (
-                <li
-                  key={conexao.nome}
-                  onClick={(e) => {
-                    e.target.classList.toggle("ativo");
-                    setNovosIntegrantes((prev) => (prev = [...prev, conexao]));
-                  }}
-                >
-                  <img
-                    src={conexao.url_foto || "./icons/padrao.svg"}
-                    alt="Foto de perfil do usuário"
-                  />
-                  <p>@{conexao.nome}</p>
-                </li>
-              ))}
-            </ul>
+
+            <div className="mb-6">
+              <h3 className="font-poppins font-medium text-lg text-neutral-700 mb-4">Selecione os participantes</h3>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {conexoesUsuario.map((conexao) => (
+                  <div
+                    key={conexao.nome}
+                    onClick={() => {
+                      setNovosIntegrantes((prev) => {
+                        const isSelected = prev.some((p) => p.nome === conexao.nome);
+                        if (isSelected) {
+                          return prev.filter((p) => p.nome !== conexao.nome);
+                        } else {
+                          return [...prev, conexao];
+                        }
+                      });
+                    }}
+                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                      novosIntegrantes.some((p) => p.nome === conexao.nome)
+                        ? "bg-cyan-50 border-2 border-cyan-200"
+                        : "hover:bg-neutral-50 border-2 border-transparent"
+                    }`}
+                  >
+                    <img
+                      src={conexao.url_foto || "./icons/padrao.svg"}
+                      alt="Foto de perfil do usuário"
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div className="flex-1">
+                      <p className="font-poppins font-medium text-neutral-800">@{conexao.nome}</p>
+                    </div>
+                    {novosIntegrantes.some((p) => p.nome === conexao.nome) && (
+                      <div className="w-5 h-5 bg-cyan-500 rounded-full flex items-center justify-center">
+                        <img src="./icons/check.svg" alt="Selecionado" className="w-3 h-3" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setNovaMensagem(false)}
+                className="flex-1 px-4 py-3 bg-neutral-200 text-neutral-700 rounded-lg font-poppins font-medium hover:bg-neutral-300 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  if (novosIntegrantes.length > 0) {
+                    setNovaMensagem("grupo-detalhes");
+                  }
+                }}
+                disabled={novosIntegrantes.length === 0}
+                className={`flex-1 px-4 py-3 rounded-lg font-poppins font-medium transition-colors ${
+                  novosIntegrantes.length > 0
+                    ? "bg-cyan-500 text-white hover:bg-cyan-600"
+                    : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
+                }`}
+              >
+                Próximo ({novosIntegrantes.length})
+              </button>
+            </div>
           </div>
         </div>
       )}
       {novaMensagem === "grupo-detalhes" && (
         <div
-          className="modal"
-          id="modal-mensagem"
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
           onClick={() => setNovaMensagem(false)}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-lato font-semibold text-xl text-neutral-800">Detalhes do Grupo</h2>
               <img
                 src="./icons/fechar.svg"
-                alt="Ícone de fechar aba de criar grupo"
+                alt="Ícone de fechar"
                 onClick={() => setNovaMensagem(false)}
+                className="w-6 h-6 cursor-pointer hover:opacity-70 transition-opacity"
               />
-              <h2>Novo grupo</h2>
-              <a onClick={() => criarGrupo()}>criar grupo</a>
             </div>
-            <label htmlFor="nome-grupo">
-              <h2>Nome do grupo</h2>
-              <input
-                type="text"
-                id="nome-grupo"
-                onChange={(e) => {
-                  novoGrupo.nome = e.target.value;
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label htmlFor="nome-grupo" className="block font-poppins font-medium text-sm text-neutral-700 mb-2">
+                  Nome do grupo *
+                </label>
+                <input
+                  type="text"
+                  id="nome-grupo"
+                  value={novoGrupo.nome || ""}
+                  onChange={(e) => {
+                    setNovoGrupo((prev) => ({ ...prev, nome: e.target.value }));
+                  }}
+                  placeholder="Digite o nome do grupo"
+                  className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg font-poppins text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="descricao-grupo" className="block font-poppins font-medium text-sm text-neutral-700 mb-2">
+                  Descrição (opcional)
+                </label>
+                <textarea
+                  id="descricao-grupo"
+                  value={novoGrupo.descricao || ""}
+                  onChange={(e) => {
+                    setNovoGrupo((prev) => ({ ...prev, descricao: e.target.value }));
+                  }}
+                  placeholder="Digite uma descrição para o grupo"
+                  rows={3}
+                  className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg font-poppins text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors resize-none"
+                />
+              </div>
+
+              <div className="bg-neutral-50 rounded-lg p-3">
+                <p className="font-poppins text-sm text-neutral-600">
+                  <span className="font-medium">Participantes selecionados:</span> {novosIntegrantes.length}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setNovaMensagem("grupo")}
+                className="flex-1 px-4 py-3 bg-neutral-200 text-neutral-700 rounded-lg font-poppins font-medium hover:bg-neutral-300 transition-colors"
+              >
+                Voltar
+              </button>
+              <button
+                onClick={() => {
+                  if (novoGrupo.nome?.trim()) {
+                    setPodeCriarGrupo(false);
+                    criarGrupo();
+                    setPodeCriarGrupo(true);
+                  }
                 }}
-              />
-            </label>
-            <label htmlFor="descricao-grupo">
-              <h2>Descrição do grupo</h2>
-              <input
-                type="text"
-                id="descricao-grupo"
-                onChange={(e) => {
-                  novoGrupo.descricao = e.target.value;
-                }}
-              />
-            </label>
+                disabled={!novoGrupo.nome?.trim() || !podeCriarGrupo}
+                className={`flex-1 px-4 py-3 rounded-lg font-poppins font-medium transition-colors ${
+                  novoGrupo.nome?.trim() || podeCriarGrupo
+                    ? "bg-cyan-500 text-white hover:bg-cyan-600 cursor-pointer"
+                    : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
+                }`}
+              >
+                Criar Grupo
+              </button>
+            </div>
           </div>
         </div>
       )}

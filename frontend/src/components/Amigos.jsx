@@ -9,7 +9,7 @@ function Amigos() {
   const [conversa, setConversa] = useState(null);
 
   return (
-    <article aria-label="Amigos" className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
+    <article aria-label="Amigos" className="min-h-screen bg-linear-to-br from-neutral-50 to-neutral-100">
       <Header tipo="logado" setTermo={setTermo} />
       <div className="w-full px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

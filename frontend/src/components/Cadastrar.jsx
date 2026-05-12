@@ -107,7 +107,7 @@ function Cadastrar() {
           <button 
             required 
             type="submit"
-            className="w-full bg-linear-to-r from-cyan-500 to-cyan-600 text-white py-4 rounded-full font-poppins font-semibold text-base hover:from-cyan-600 hover:to-cyan-700 transition-all shadow-md hover:shadow-lg"
+            className="w-full border-2 bg-linear-to-r from-cyan-500 to-cyan-600 text-white py-3 rounded-full font-poppins font-semibold text-base hover:from-cyan-600 hover:to-cyan-700 shadow-md hover:shadow-lg hover:text-white hover:border-cyan-800 transition-colors"
           >
             Cadastrar
           </button>

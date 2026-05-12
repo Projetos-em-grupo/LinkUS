@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAutenticador } from "./providers/useAutenticador";
 import { useGrupos } from "./providers/useGrupos";
 import { useMensagens } from "./providers/useMensagens";
@@ -10,28 +10,17 @@ import ConversasRecentes from "./ConversasRecentes";
 
 function Post() {
   const navigate = useNavigate();
-  const dados = useLocation().state;
   const { acharGruposPorUsuario } = useGrupos();
   const { acharMensagensPorUsuario } = useMensagens();
-  const { login, usuario, token } = useAutenticador();
+  const { usuario, token } = useAutenticador();
   const [termo, setTermo] = useState(null);
   const [acharUsuarioInfo, setAcharUsuarioInfo] = useState(true);
-  const [jaTentouLogar, setJaTentouLogar] = useState(false);
 
   useEffect(() => {
-    async function logar() {
-      if (usuario || token || jaTentouLogar) return;
-      try {
-        if (!(await login(dados.email, dados.senha))) navigate("/");
-      } catch {
-        navigate("/");
-      } finally {
-        setJaTentouLogar(true);
-      }
+    if (!token) {
+      navigate("/");
     }
-
-    logar();
-  }, [token, usuario, dados, navigate, jaTentouLogar]);
+  }, [token, navigate]);
 
   useEffect(() => {
     if (usuario?.nome && acharUsuarioInfo) {
@@ -39,7 +28,7 @@ function Post() {
       acharMensagensPorUsuario(usuario.email);
       setAcharUsuarioInfo(false);
     }
-  }, [usuario, acharUsuarioInfo]);
+  }, [usuario, acharUsuarioInfo, acharGruposPorUsuario, acharMensagensPorUsuario]);
 
   return (
     <article aria-label="postagens" className="min-h-screen bg-linear-to-br from-neutral-50 to-neutral-100">

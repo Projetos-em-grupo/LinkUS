@@ -5,7 +5,7 @@ import { useUsuarios } from "./providers/useUsuarios.jsx";
 
 function App() {
   const { usuariosLoading } = useUsuarios();
-  return usuariosLoading ? <Loading /> : <Header tipo={"pagina-inicial"} />;
+  return usuariosLoading ? <Loading /> : <Header tipo={"cadastro"} />;
 }
 
 export default App;

@@ -10,11 +10,32 @@ function PostagensUsuario() {
   const [editarPerfil, setEditarPerfil] = useState(false);
   const [novaFoto, setNovaFoto] = useState(null);
   const [novosInteresses, setNovosInteresses] = useState([]);
-  const [inputQuantidade, setInputQuantidade] = useState(0);
+  const [tagInput, setTagInput] = useState("");
+  const [showTagInput, setShowTagInput] = useState(false);
   const [jaCarregou, setJaCarregou] = useState(false);
   const [fotoPreview, setFotoPreview] = useState("./icons/padrao.svg");
+  const [podeSalvarEdicao, setPodeSalvarEdicao] = useState(true);
+
+  function adicionarTag() {
+    const valor = tagInput.trim().toLowerCase();
+    if (
+      valor === "" ||
+      novosInteresses.includes(valor) ||
+      novosInteresses.length >= 5
+    ) {
+      setTagInput("");
+      return;
+    }
+
+    setNovosInteresses((prev) => [...prev, valor]);
+    setTagInput("");
+    setShowTagInput(false);
+  }
 
   async function atualizarPerfil() {
+    if (!podeSalvarEdicao) return;
+    setPodeSalvarEdicao(false);
+
     const data = {};
     data.email = usuario.email;
     data.interesses = novosInteresses;
@@ -55,6 +76,7 @@ function PostagensUsuario() {
       setTokenNovo(await res.json());
       setNovaFoto(null);
       setEditarPerfil(false);
+      setPodeSalvarEdicao(true);
     } else {
       console.error("Erro ao tentar atualizar o perfil: " + (await res.text()));
     }
@@ -181,7 +203,7 @@ function PostagensUsuario() {
   }, [novaFoto, usuario?.url_foto]);
 
   return (
-    <div className="mt-6 max-h-125 overflow-y-auto pr-4">
+    <div className="mt-6 max-h-190 overflow-y-auto pr-4">
       <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div className="flex items-center gap-4 mb-4 md:mb-0">
@@ -189,7 +211,7 @@ function PostagensUsuario() {
               id="foto-perfil"
               src={usuario?.url_foto ? usuario.url_foto : "./icons/padrao.svg"}
               alt="Foto de perfil do usuario"
-              className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-primary-200 shadow-md"
+              className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-cyan-200 shadow-md"
             />
             <div>
               <p className="font-lato font-bold text-xl text-neutral-800">
@@ -202,7 +224,7 @@ function PostagensUsuario() {
           </div>
           <button
             onClick={() => setEditarPerfil(true)}
-            className="px-6 py-3 bg-primary-500 bg-linear-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-600 hover:to-cyan-700 shadow-md hover:shadow-lg rounded-full font-medium hover:bg-primary-600 transition-colors hover:cursor-pointer"
+            className="px-6 py-3 bg-cyan-500 bg-linear-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-600 hover:to-cyan-700 shadow-md hover:shadow-lg rounded-full font-medium hover:bg-cyan-600 transition-colors hover:cursor-pointer"
           >
             Editar perfil
           </button>
@@ -217,7 +239,7 @@ function PostagensUsuario() {
               {usuario.interesses.map((interesse) => (
                 <span
                   key={interesse}
-                  className="bg-linear-to-r from-primary-500 to-secondary-500 text-white px-4 py-2 rounded-full flex gap-2 items-center shadow-sm"
+                  className="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-4 py-2 text-cyan-700 shadow-sm transition hover:bg-cyan-100"
                 >
                   <img
                     src="./icons/hashtag.svg"
@@ -359,84 +381,82 @@ function PostagensUsuario() {
               <button
                 type="button"
                 onClick={() => atualizarPerfil()}
-                className="self-start sm:self-center bg-linear-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-600 hover:to-cyan-700 shadow-md hover:shadow-lg px-8 py-3 rounded-full font-poppins font-semibold transition-colors"
+                className="cursor-pointer self-start sm:self-center bg-linear-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-600 hover:to-cyan-700 shadow-md hover:shadow-lg px-8 py-3 rounded-full font-poppins font-semibold transition-colors"
               >
                 salvar
               </button>
             </div>
 
             <div className="border border-neutral-600 rounded-2xl p-5">
-              <div className="flex items-center justify-between gap-4 mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
                 <p className="font-poppins font-semibold text-neutral-200 text-xl">
                   Tags
                 </p>
                 <button
                   type="button"
-                  onClick={() => {
-                    if (inputQuantidade < 5 && (inputQuantidade + novosInteresses.length < 5)) {
-                      setInputQuantidade((prev) => prev + 1);
-                    }
-                  }}
+                  onClick={() => setShowTagInput((prev) => !prev)}
                   className="text-sm text-cyan-300 hover:text-cyan-200 transition-colors cursor-pointer"
                 >
-                  adicionar tag
+                  {showTagInput ? "Cancelar" : "Adicionar tag"}
                 </button>
               </div>
 
-              <ul className="flex flex-wrap gap-3">
-                {novosInteresses &&
-                  novosInteresses[0] != null &&
-                  novosInteresses.map((interesse) => (
-                    <li
-                      key={interesse}
-                      className="bg-primary-500 text-neutral-100 px-3 py-2 rounded-2xl flex items-center gap-2"
+              <ul className="flex flex-wrap gap-3 mb-4">
+                {novosInteresses.map((interesse) => (
+                  <li
+                    key={interesse}
+                    className="inline-flex items-center gap-2 rounded-full border border-cyan-400 bg-cyan-500/15 text-cyan-50 px-4 py-2 shadow-sm"
+                  >
+                    <p className="font-poppins text-sm">{interesse}</p>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setNovosInteresses((prev) => prev.filter((i) => i !== interesse))
+                      }
+                      className="rounded-full p-1 bg-white/15 hover:bg-white/25 transition-colors"
+                      aria-label={`Remover tag ${interesse}`}
                     >
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setNovosInteresses((prev) =>
-                            prev.filter((i) => i !== interesse)
-                          )
-                        }
-                        className="cursor-pointer"
-                      >
-                        <img
-                          src="./icons/fechar.svg"
-                          alt="Icone de remover interesse"
-                          className="w-4 h-4"
-                        />
-                      </button>
-                      <p className="font-poppins text-sm">{interesse}</p>
-                    </li>
-                  ))}
+                      <img
+                        src="./icons/fechar.svg"
+                        alt="Icone de remover interesse"
+                        className="w-3 h-3"
+                      />
+                    </button>
+                  </li>
+                ))}
               </ul>
 
-              {novosInteresses.length < 5 && inputQuantidade && (function() {
-                const inputs = [];
-                for (let i = 0; i < inputQuantidade; i++) {
-                  inputs.push(
-                    <input
-                      key={i}
-                      type="text"
-                      id="interesse"
-                      className="mt-4 w-full bg-neutral-800 text-neutral-100 px-4 py-3 border border-neutral-500 rounded-xl font-poppins text-sm focus:outline-none focus:border-cyan-400"
-                      placeholder="Digite uma tag"
-                      onKeyUp={(e) => {
-                        if (e.key === "Enter") {
-                          const valor = e.target.value.trim().toLowerCase();
-                          if (valor !== "" && !novosInteresses.includes(valor)) {
-                            setNovosInteresses((prev) => [...prev, valor]);
-                            setInputQuantidade((prev) => prev - 1);
-                          }
-                          e.target.value = "";
-                        }
-                      }}
-                    />
-                  );
-                }
-                return inputs;
-              })()
-              }
+              {showTagInput && novosInteresses.length < 5 && (
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="text"
+                    id="interesse"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        adicionarTag();
+                      }
+                    }}
+                    className="mt-2 sm:mt-0 w-full bg-neutral-800 text-neutral-100 px-4 py-3 border border-neutral-500 rounded-xl font-poppins text-sm focus:outline-none focus:border-cyan-400"
+                    placeholder="Digite uma tag e pressione Enter"
+                  />
+                  <button
+                    type="button"
+                    onClick={adicionarTag}
+                    className="px-5 py-3 bg-cyan-500 text-white rounded-full font-poppins font-medium hover:bg-cyan-600 transition-colors"
+                  >
+                    Adicionar
+                  </button>
+                </div>
+              )}
+
+              <p className={`text-xs mt-3 ${novosInteresses.length >= 5 ? "text-emerald-300" : "text-neutral-400"}`}>
+                {novosInteresses.length >= 5
+                  ? "Você alcançou o limite de 5 tags."
+                  : "Use o botão acima para adicionar até 5 interesses."}
+              </p>
             </div>
           </div>
         </div>

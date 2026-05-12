@@ -117,7 +117,7 @@ export async function atualizarUsuario(req, res) {
   const apagarUsuarioInteressesSQL =
     "DELETE from usuario_interesse where fk_usuario = ?";
   const interesseJaExisteSQL =
-    "SELECT id_interesse from interesse where id_interesse = ?";
+    "SELECT id_interesse from interesse where nome = ?";
   const acharNovoInteresseSQL =
     "SELECT id_interesse from interesse where nome = ?";
   const criarInteresseSQL = "INSERT into interesse(nome) values(?)";

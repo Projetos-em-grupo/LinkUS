@@ -7,6 +7,12 @@
   border: 1px solid #e5e7eb;
 }
 
+#amigos-usuario h2 {
+  margin-bottom: 16px;
+  color: #1f2937;
+  font-size: 1.25rem;
+}
+
 #amigos-usuario li {
   display: flex;
   align-items: center;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { GruposContext } from "./useGrupos";
 import { useAutenticador } from "./useAutenticador";
 
@@ -9,7 +9,7 @@ export function GruposProvider({ children }) {
   const [gruposUsuarioLoading, setGruposUsuarioLoading] = useState(true);
   const [gruposUsuario, setGruposUsuario] = useState(null);
 
-  async function acharGruposPorUsuario(nome) {
+  const acharGruposPorUsuario = useCallback(async (nome) => {
     setGruposUsuarioLoading(true);
     try {
       const result = await fetch(
@@ -29,7 +29,7 @@ export function GruposProvider({ children }) {
     } finally {
       setGruposUsuarioLoading(false);
     }
-  }
+  }, [token]);
 
   useEffect(() => {
     async function acharGrupos() {

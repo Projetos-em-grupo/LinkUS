@@ -4,16 +4,15 @@ import { useGrupos } from "./providers/useGrupos";
 
 function Sidebar({ ativo }) {
   const navigate = useNavigate();
-  const { gruposUsuario } = useGrupos();
+  const { gruposUsuario, gruposUsuarioLoading } = useGrupos();
 
-  console.log(gruposUsuario);
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
       <Link 
         className={`flex gap-5 items-center py-3 px-4 rounded-lg mb-2 transition-all duration-200 ${
           ativo === "home" 
-            ? 'bg-primary-100 text-primary-700 shadow-sm' 
-            : 'bg-neutral-50 hover:bg-neutral-100 text-neutral-700 hover:text-primary-600'
+            ? 'bg-cyan-100 text-cyan-700 shadow-sm' 
+            : 'bg-neutral-50 hover:bg-neutral-100 text-neutral-700 hover:text-cyan-600'
         }`} 
         to="/post"
       >
@@ -23,8 +22,8 @@ function Sidebar({ ativo }) {
       <Link 
         className={`flex gap-5 items-center py-3 px-4 rounded-lg mb-2 transition-all duration-200 ${
           ativo === "mensagem" 
-            ? 'bg-primary-100 text-primary-700 shadow-sm' 
-            : 'bg-neutral-50 hover:bg-neutral-100 text-neutral-700 hover:text-primary-600'
+            ? 'bg-cyan-100 text-cyan-700 shadow-sm' 
+            : 'bg-neutral-50 hover:bg-neutral-100 text-neutral-700 hover:text-cyan-600'
         }`} 
         to="/mensagem"
       >
@@ -34,8 +33,8 @@ function Sidebar({ ativo }) {
       <Link 
         className={`flex gap-5 items-center py-3 px-4 rounded-lg mb-2 transition-all duration-200 ${
           ativo === "amigos" 
-            ? 'bg-primary-100 text-primary-700 shadow-sm' 
-            : 'bg-neutral-50 hover:bg-neutral-100 text-neutral-700 hover:text-primary-600'
+            ? 'bg-cyan-100 text-cyan-700 shadow-sm' 
+            : 'bg-neutral-50 hover:bg-neutral-100 text-neutral-700 hover:text-cyan-600'
         }`} 
         to="/amigo"
       >
@@ -45,19 +44,24 @@ function Sidebar({ ativo }) {
       <div className="mt-8 pt-6 border-t border-neutral-200">
         <h2 className="font-lato font-semibold text-xl text-neutral-800 mb-4">Meus grupos</h2>
         <ul className="space-y-3">
-          {gruposUsuario &&
+          {gruposUsuarioLoading ? (
+            <li className="flex items-center gap-3 p-4 rounded-xl border border-dashed border-neutral-200 bg-neutral-50 text-neutral-500">
+              <img src="./icons/grupos.svg" alt="Carregando" className="w-6 h-6" />
+              <p className="font-poppins text-sm">Carregando seus grupos...</p>
+            </li>
+          ) : gruposUsuario?.length > 0 ? (
             gruposUsuario.map((grupo, index) =>
               index > 2 ? null : (
                 <li
                   key={index}
                   onClick={() => {
-                    navigate("/mensagem", { state: grupo });
+                    navigate("/mensagem", { state: { ...grupo, tipo: "grupo" } });
                   }}
                   className="flex gap-3 p-3 rounded-lg cursor-pointer hover:bg-neutral-50 transition-colors border border-transparent hover:border-neutral-200"
                 >
                   <img
                     id="foto-perfil"
-                    src={gruposUsuario.url_foto ?? "./icons/padrao.svg"}
+                    src={grupo.url_foto ?? "./icons/padrao.svg"}
                     alt="Imagem do grupo"
                     className="w-12 h-12 rounded-lg object-cover"
                   />
@@ -67,7 +71,16 @@ function Sidebar({ ativo }) {
                   </div>
                 </li>
               )
-            )}
+            )
+          ) : (
+            <li className="flex flex-col items-start gap-2 p-4 rounded-xl border border-dashed border-neutral-200 bg-neutral-50 text-neutral-500">
+              <div className="flex items-center gap-3">
+                <img src="./icons/grupo.svg" alt="Sem grupos" className="w-6 h-6" />
+                <p className="font-poppins font-semibold text-neutral-700">Nenhum grupo encontrado</p>
+              </div>
+              <p className="font-poppins text-sm text-neutral-500">Participe ou crie um grupo para ele aparecer aqui.</p>
+            </li>
+          )}
         </ul>
       </div>
     </div>

@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { PostagensContext } from "./usePostagens";
 import { useAutenticador } from "./useAutenticador";
 
 export function PostagensProvider({ children }) {
   const { token, usuario } = useAutenticador();
   const [postagensLoading, setPostagensLoading] = useState(true);
-  const [postagens, setPostagens] = useState(null);
+  const [postagens, setPostagens] = useState([]);
   const [postagensUsuarioLoading, setPostagensUsuarioLoading] = useState(true);
-  const [postagensUsuario, setPostagensUsuario] = useState(null);
+  const [postagensUsuario, setPostagensUsuario] = useState([]);
   const [reloadPostagens, setReloadPostagens] = useState(false);
 
-  async function acharPostagensPorUsuario(nome) {
+  const acharPostagensPorUsuario = useCallback(async (nome) => {
     setPostagensUsuarioLoading(true);
     try {
       const result = await fetch(
@@ -69,7 +69,7 @@ export function PostagensProvider({ children }) {
     } finally {
       setPostagensUsuarioLoading(false);
     }
-  }
+  }, [token, usuario]);
 
   useEffect(() => {
     async function acharPostagens() {
@@ -171,7 +171,7 @@ export function PostagensProvider({ children }) {
     }
 
     acharPostagens();
-  }, [reloadPostagens, usuario]);
+  }, [reloadPostagens, usuario, token]);
 
   return (
     <PostagensContext.Provider

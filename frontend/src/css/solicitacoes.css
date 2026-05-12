@@ -20,6 +20,15 @@
   transition: all 0.2s ease;
 }
 
+#solicitacoes .solicitacoes-vazias {
+  border-bottom: none;
+  padding: 20px 12px;
+  text-align: center;
+  color: #6b7280;
+  font: 400 0.95rem / 1.5 "Poppins";
+  background: linear-gradient(180deg, #f9fafb, #ffffff);
+}
+
 #solicitacoes li:hover {
   background-color: #f9fafb;
 }
