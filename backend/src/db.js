@@ -1,27 +1,27 @@
 import postgres from "postgres";
 import dotenv from "dotenv";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const schemaPath = path.resolve(__dirname, "../scripts/schema.sql");
-
-const connectionString =
-  process.env.DATABASE_URL;
-
-console.log("Conectando ao banco...", connectionString);
+const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-  throw new Error(
-    "Banco nao configurado. Defina DATABASE_URL com a connection string do Supabase."
-  );
+  throw new Error("DATABASE_URL nao definida");
 }
 
-export const sql = postgres(connectionString);
+const globalForSql = globalThis;
+
+export const sql =
+  globalForSql.sql ||
+  postgres(connectionString, {
+    max: 1,
+    idle_timeout: 5,
+    connect_timeout: 10,
+  });
+
+if (process.env.NODE_ENV !== "production") {
+  globalForSql.sql = sql;
+}
 
 function normalizeParams(params) {
   if (params === undefined) return [];
@@ -35,7 +35,11 @@ function convertPlaceholders(query) {
 
 async function query(text, params) {
   const values = normalizeParams(params);
-  const result = await sql.unsafe(convertPlaceholders(text), values);
+
+  const result = await sql.unsafe(
+    convertPlaceholders(text),
+    values
+  );
 
   if (result.command === "SELECT") {
     return [result, null];
@@ -51,20 +55,6 @@ async function query(text, params) {
   ];
 }
 
-async function initializeSchema() {
-  const shouldInitializeSchema = process.env.DB_INIT_SCHEMA !== "false";
-
-  if (!shouldInitializeSchema) {
-    return;
-  }
-
-  const schema = fs.readFileSync(schemaPath, "utf8");
-  await sql.unsafe(schema);
-}
-
-await initializeSchema();
-
 export default {
   query,
-  end: () => sql.end(),
 };

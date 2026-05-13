@@ -10,6 +10,12 @@ export function PostagensProvider({ children }) {
   const [postagensUsuario, setPostagensUsuario] = useState([]);
   const [reloadPostagens, setReloadPostagens] = useState(false);
 
+  function ordenarPorDataDesc(posts) {
+    return [...posts].sort(
+      (a, b) => new Date(b.data_criacao) - new Date(a.data_criacao)
+    );
+  }
+
   const acharPostagensPorUsuario = useCallback(async (nome) => {
     setPostagensUsuarioLoading(true);
     try {
@@ -63,7 +69,7 @@ export function PostagensProvider({ children }) {
         posts = novosPosts;
       }
 
-      setPostagensUsuario(posts);
+      setPostagensUsuario(ordenarPorDataDesc(posts));
     } catch (error) {
       console.error("Erro de requisição" + error);
     } finally {
@@ -162,7 +168,7 @@ export function PostagensProvider({ children }) {
           posts = novosPosts;
         }
 
-        setPostagens(posts);
+        setPostagens(ordenarPorDataDesc(posts));
       } catch (error) {
         console.error("Erro ao carregar as postagens" + error);
       } finally {

@@ -62,6 +62,7 @@ function ListarComentarios({ comentarios, post, onInteragir }) {
 function PostagemItem({ postagem, usuario, conexoesUsuario = [], token, setReloadPostagens }) {
   const navigate = useNavigate();
   const [podeInteragir, setPodeInteragir] = useState(true);
+  const [deletando, setDeletando] = useState(false);
 
   async function handleInteragir(post, tipo, comentario) {
     if (!podeInteragir) return;
@@ -111,10 +112,58 @@ function PostagemItem({ postagem, usuario, conexoesUsuario = [], token, setReloa
     }
   }
 
+  async function handleDeletarPostagem() {
+    if (deletando) return;
+    if (!window.confirm("Tem certeza que deseja deletar esta postagem?")) return;
+
+    setDeletando(true);
+
+    try {
+      const result = await fetch(
+        `https://link-us-virid.vercel.app/_/backend/postagem/deletarPostagem/${postagem.id_postagem}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (result.ok) {
+        setReloadPostagens((prev) => !prev);
+      } else {
+        console.error("Erro ao deletar postagem:", await result.text());
+      }
+    } catch (error) {
+      console.error("Erro ao deletar postagem:", error);
+    } finally {
+      setDeletando(false);
+    }
+  }
+
+  const podeDeletar =
+    usuario &&
+    (usuario.nome === postagem.nome || usuario.funcao === "admin");
+
   return (
-    <li className="bg-neutral-100 rounded-2xl p-5 shadow-lg shadow-neutral-700/40 border border-neutral-400/40">
+    <li className="relative bg-neutral-100 rounded-2xl p-5 shadow-lg shadow-neutral-700/40 border border-neutral-400/40">
+      {podeDeletar && (
+        <button
+          type="button"
+          onClick={handleDeletarPostagem}
+          disabled={deletando}
+          className="z-20 cursor-pointer hover:bg-slate-300 absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-700 shadow-md transition disabled:cursor-not-allowed disabled:opacity-50"
+          title="Deletar postagem"
+        >
+          <img
+            src="./icons/lixeira.svg"
+            alt="Deletar postagem"
+            className="h-5 w-5"
+          />
+        </button>
+      )}
       <div
-        className="flex gap-5 items-start cursor-pointer mb-4 hover:opacity-80 transition-opacity"
+        className="flex gap-5 items-start cursor-pointer mb-4 pr-12 hover:opacity-80 transition-opacity"
         onClick={(e) => {
           e.stopPropagation();
           if (postagem.nome !== usuario.nome) {
