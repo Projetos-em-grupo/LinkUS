@@ -57,7 +57,7 @@ function Sidebar({ ativo }) {
                   onClick={() => {
                     navigate("/mensagem", { state: { ...grupo, tipo: "grupo" } });
                   }}
-                  className="flex gap-3 p-3 rounded-lg cursor-pointer hover:bg-neutral-50 transition-colors border border-transparent hover:border-neutral-200"
+                  className="flex gap-3 p-3 rounded-lg cursor-pointer hover:bg-cyan-50 hover:border-cyan-200 transition-colors border border-transparent"
                 >
                   <img
                     id="foto-perfil"

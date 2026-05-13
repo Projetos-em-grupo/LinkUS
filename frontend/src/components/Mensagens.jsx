@@ -40,7 +40,7 @@ function Mensagens() {
           </div>
           <div className="md:col-span-1 h-full">
             {modal ? (
-              <GrupoInfo grupo={modal} />
+              <GrupoInfo grupo={modal} setModal={setModal} />
             ) : (
               <Conversas
                 conversa={conversa}

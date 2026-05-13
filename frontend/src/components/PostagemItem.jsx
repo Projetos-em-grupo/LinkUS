@@ -112,7 +112,7 @@ function PostagemItem({ postagem, usuario, conexoesUsuario = [], token, setReloa
   }
 
   return (
-    <li className="bg-neutral-100 rounded-2xl p-5">
+    <li className="bg-neutral-100 rounded-2xl p-5 shadow-lg shadow-neutral-700/40 border border-neutral-400/40">
       <div
         className="flex gap-5 items-start cursor-pointer mb-4 hover:opacity-80 transition-opacity"
         onClick={(e) => {
@@ -154,7 +154,7 @@ function PostagemItem({ postagem, usuario, conexoesUsuario = [], token, setReloa
         <img
           src={postagem.url_midia}
           alt="Post imagem"
-          className="w-full max-w-2xl max-h-96 rounded-lg object-cover mb-4"
+          className="max-w-full max-h-96 rounded-lg object-contain mb-4"
         />
       )}
 

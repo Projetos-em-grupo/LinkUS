@@ -37,7 +37,7 @@ function Postagens({ termo }) {
         setReloadPostagens={setReloadPostagens}
       />
 
-      <ul className="space-y-6">
+      <ul className="space-y-10">
         {postagensFiltradas?.map((postagem) =>
           postagem ? (
             <PostagemItem

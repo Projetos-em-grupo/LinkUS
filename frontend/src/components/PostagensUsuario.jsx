@@ -287,7 +287,7 @@ function PostagensUsuario() {
                 <img
                   src={postagem.url_midia}
                   alt="Imagem da postagem"
-                  className="w-full max-w-2xl max-h-96 rounded-lg object-cover mb-4"
+                  className="max-w-full max-h-96 rounded-lg object-contain mb-4"
                 />
               )}
 

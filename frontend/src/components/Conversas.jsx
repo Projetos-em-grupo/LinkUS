@@ -192,8 +192,8 @@ function Conversas({ conversa, setConversa, setModal }) {
     return <Erro mensagem={modalErro} setModalErro={setModalErro} />;
 
   return conversa ? (
-    <div className="flex flex-col h-full min-h-[70vh] bg-white rounded-2xl shadow-sm border border-neutral-200 overflow-hidden">
-      <div className="flex items-center justify-between p-4 border-b border-neutral-200 bg-neutral-50">
+    <div className="flex flex-col h-full min-h-[70vh] bg-neutral-50 rounded-2xl shadow-sm border border-neutral-200 overflow-hidden">
+      <div className="flex items-center justify-between p-4 border-b border-neutral-200 bg-white">
         <div className="flex items-center gap-3">
           <img
             src={conversa.url_foto || "./icons/padrao.svg"}
@@ -211,7 +211,7 @@ function Conversas({ conversa, setConversa, setModal }) {
           {conversa.tipo === "grupo" && (
             <button
               onClick={() => setModal(conversa)}
-              className="p-2 hover:bg-neutral-200 rounded-full transition-colors"
+              className="cursor-pointer p-2 hover:bg-neutral-200 rounded-full transition-colors"
             >
               <img
                 src="./icons/info.svg"
@@ -240,14 +240,14 @@ function Conversas({ conversa, setConversa, setModal }) {
             return (
               <div
                 key={mensagem.id_mensagem}
-                className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
+                className={`flex w-full ${isOwnMessage ? "justify-end" : "justify-start"}`}
                 id={mensagem.id_mensagem === modalMensagem?.id_mensagem ? "modal" : ""}
                 onClick={(e) => {
                   e.stopPropagation();
                   setModalMensagem(mensagem);
                 }}
               >
-                <div className="relative max-w-xs">
+                <div className="relative w-fit max-w-[90%] md:max-w-[80%] lg:max-w-[70%]">
                   {modalMensagem?.id_mensagem === mensagem.id_mensagem && (
                     <div
                       className="absolute -top-12 left-0 bg-red-500 text-white flex gap-2 px-3 py-2 rounded-lg cursor-pointer hover:bg-red-600 transition-colors z-10 shadow-lg"
@@ -311,10 +311,10 @@ function Conversas({ conversa, setConversa, setModal }) {
 
                   <div className={`px-4 py-3 rounded-2xl shadow-sm ${
                     isOwnMessage
-                      ? "bg-cyan-500 text-white rounded-br-md"
-                      : "bg-neutral-100 text-neutral-900 rounded-bl-md"
+                      ? "bg-cyan-500 text-white rounded-br-md border border-cyan-500/20 w-fit ml-auto px-4 py-2"
+                      : "bg-neutral-200 text-neutral-950 rounded-bl-md border w-fit border-neutral-300"
                   }`}>
-                    <p className="font-poppins text-sm">{mensagem.texto}</p>
+                    <p className="font-poppins text-sm wrap-break-word">{mensagem.texto}</p>
                   </div>
 
                   <div className={`flex items-center gap-2 mt-2 text-xs font-poppins ${
@@ -352,7 +352,7 @@ function Conversas({ conversa, setConversa, setModal }) {
           <input
             type="text"
             placeholder="Digite uma mensagem..."
-            className="cursor-pointer flex-1 bg-white border border-neutral-200 rounded-full px-4 py-3 font-poppins text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
+            className="cursor-text flex-1 bg-neutral-100 border border-neutral-300 rounded-full px-4 py-3 font-poppins text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
             onKeyDown={(e) => {
               if (e.key === "Enter" && e.target.value.trim()) {
                 enviarMensagem(e.target.value.trim());
@@ -368,7 +368,7 @@ function Conversas({ conversa, setConversa, setModal }) {
                 input.value = "";
               }
             }}
-            className="p-3 bg-cyan-500 hover:bg-cyan-600 rounded-full transition-colors shadow-md hover:shadow-lg"
+            className="cursor-pointer p-3 bg-cyan-500 hover:bg-cyan-600 rounded-full transition-colors shadow-md hover:shadow-lg"
           >
             <img
               src="./icons/enviarSolicitacao.svg"
