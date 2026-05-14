@@ -28,7 +28,7 @@ function Postagens({ termo }) {
   if (!postagens || conexoesUsuarioLoading) return <Loading />;
 
   return (
-    <div className="mt-6 pr-12">
+    <div className="mt-6 flex h-full min-h-0 flex-col pr-2 md:pr-4">
       <PostInput
         usuario={usuario}
         token={token}
@@ -37,7 +37,7 @@ function Postagens({ termo }) {
         setReloadPostagens={setReloadPostagens}
       />
 
-      <ul className="space-y-10">
+      <ul className="flex-1 min-h-0 space-y-10 overflow-y-auto overscroll-contain pr-2">
         {postagensFiltradas?.map((postagem) =>
           postagem ? (
             <PostagemItem

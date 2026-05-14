@@ -5,12 +5,14 @@ import {
   temInteracaoComentario,
   deletarInteracao,
   atualizarInteracao,
+  listarInteracoesUsuario,
 } from "../controllers/interacaoController.js";
 import { verificarToken } from "../middlewareAutenticador.js";
 
 const router = Router();
 
 router.post("/criarInteracao", verificarToken, criarInteracao);
+router.post("/listarInteracoesUsuario", verificarToken, listarInteracoesUsuario);
 router.post("/temInteracaoPost", verificarToken, temInteracaoPost);
 router.post("/temInteracaoComentario", verificarToken, temInteracaoComentario);
 router.delete(

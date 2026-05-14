@@ -24,7 +24,7 @@ function Solicitacoes() {
 
   return (
     <div id="solicitacoes">
-      <h2>Solicitacoes</h2>
+      <h2>Solicitações</h2>
       <ul>
         {solicitacoesPendentes.length === 0 ? (
           <li className="solicitacoes-vazias">
@@ -66,7 +66,7 @@ function Solicitacoes() {
                           (await result.text())
                       );
 
-                    acharConexoesPorUsuario(usuario.nome);
+                    acharConexoesPorUsuario(usuario.nome, { force: true });
                   }}
                 >
                   Aceitar
@@ -95,7 +95,7 @@ function Solicitacoes() {
                           (await result.text())
                       );
 
-                    acharConexoesPorUsuario(usuario.nome);
+                    acharConexoesPorUsuario(usuario.nome, { force: true });
                   }}
                 >
                   Recusar

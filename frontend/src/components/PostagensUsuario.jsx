@@ -239,14 +239,18 @@ function PostagensUsuario() {
               {usuario.interesses.map((interesse) => (
                 <span
                   key={interesse}
-                  className="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-4 py-2 text-cyan-700 shadow-sm transition hover:bg-cyan-100"
+                  className="inline-flex items-center gap-3 rounded-[18px] border border-cyan-100 bg-linear-to-r from-cyan-50 via-white to-sky-50 px-3 py-2.5 text-slate-700 shadow-[0_12px_24px_-20px_rgba(6,182,212,0.9)] ring-1 ring-white transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-[0_18px_30px_-22px_rgba(14,116,144,0.65)]"
                 >
-                  <img
-                    src="./icons/hashtag.svg"
-                    alt="Icone de hashtag"
-                    className="w-4 h-4"
-                  />
-                  <p className="font-medium text-sm">{interesse}</p>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 shadow-sm">
+                    <img
+                      src="./icons/hashtag.svg"
+                      alt="Icone de hashtag"
+                      className="h-4 w-4 brightness-0 invert"
+                    />
+                  </span>
+                  <span className="font-poppins text-sm font-semibold tracking-[0.01em]">
+                    {interesse}
+                  </span>
                 </span>
               ))}
             </div>

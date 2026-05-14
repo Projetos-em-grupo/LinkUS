@@ -10,14 +10,18 @@ function OutroUsuario() {
   const outroUsuario = useLocation().state;
 
   return (
-    <article aria-label="postagens" id="postagens-article" className="min-h-screen bg-linear-to-br from-neutral-50 to-neutral-100">
+    <article
+      aria-label="postagens"
+      id="postagens-article"
+      className="flex h-screen flex-col overflow-hidden bg-linear-to-br from-neutral-50 to-neutral-100"
+    >
       <Header tipo="logado" setTermo={setTermo} />
-      <div className="w-full px-4 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="min-h-0 flex-1 w-full px-4 py-6">
+        <div className="grid h-full min-h-0 grid-cols-1 gap-6 md:grid-cols-3">
           <div className="md:col-span-1">
             <Sidebar />
           </div>
-          <div className="md:col-span-1">
+          <div className="min-h-0 md:col-span-1">
             <PostagensOutroUsuario outroUsuario={outroUsuario} termo={termo} />
           </div>
           <div className="md:col-span-1">

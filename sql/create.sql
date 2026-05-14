@@ -124,3 +124,11 @@ CREATE TABLE IF NOT EXISTS interacao (
   FOREIGN KEY (fk_usuario) REFERENCES usuario(id_usuario),
   FOREIGN KEY (fk_comentario) REFERENCES comentario(id_comentario)
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_interacao_post_usuario
+  ON interacao (fk_usuario, fk_postagem)
+  WHERE fk_comentario IS NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_interacao_comentario_usuario
+  ON interacao (fk_usuario, fk_comentario)
+  WHERE fk_comentario IS NOT NULL;

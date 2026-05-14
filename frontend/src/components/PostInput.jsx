@@ -33,11 +33,6 @@ function PostInput({ usuario, token, midia, setMidia, setReloadPostagens }) {
     }
   }
 
-  async function handleKeyUp(e) {
-    if (e.key !== "Enter") return;
-    await enviarPostagem();
-  }
-
   return (
     <div className="mb-8 rounded-[28px] border border-neutral-200 bg-linear-to-r from-white via-neutral-50 to-neutral-100/90 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
       <div className="flex items-start gap-4">
@@ -50,14 +45,13 @@ function PostInput({ usuario, token, midia, setMidia, setReloadPostagens }) {
 
         <div className="flex-1">
           <div className="group flex flex-col gap-3 rounded-3xl border border-transparent bg-white/90 px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] ring-1 ring-neutral-200 transition-all duration-200 hover:ring-neutral-300 focus-within:-translate-y-0.5 focus-within:ring-2 focus-within:ring-cyan-400/60 sm:flex-row sm:items-center sm:px-4 sm:py-2">
-            <input
+            <textarea
               value={texto}
               onChange={(e) => setTexto(e.target.value)}
               type="text"
               id="novo-post-input"
               placeholder="O que você quer compartilhar?"
-              className="min-w-0 flex-1 bg-transparent px-3 py-2 text-sm font-poppins text-slate-700 placeholder:text-slate-400 focus:outline-none"
-              onKeyUp={handleKeyUp}
+              className="resize-none min-w-0 h-10 flex-1 bg-transparent px-3 py-2 text-sm font-poppins text-slate-700 placeholder:text-slate-400 focus:outline-none"
             />
 
             <input
@@ -89,7 +83,8 @@ function PostInput({ usuario, token, midia, setMidia, setReloadPostagens }) {
             <button
               type="button"
               onClick={enviarPostagem}
-              className="cursor-pointer flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500 text-white transition hover:bg-cyan-600"
+              disabled={!texto.trim()}
+              className={`cursor-pointer flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500 text-white transition hover:bg-cyan-600 ${!texto.trim() ? "disabled:cursor-not-allowed disabled:bg-cyan-200" : ""}`}
               title="Enviar postagem"
             >
               <img

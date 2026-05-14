@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAutenticador } from "./providers/useAutenticador";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -7,10 +7,18 @@ function GrupoInfo({ grupo, setModal }) {
   const { usuario, token } = useAutenticador();
   const [atualizarGrupo, setAtualizarGrupo] = useState();
   const [participantes, setParticipantes] = useState();
+  const participantesCacheRef = useRef(new Map());
 
   useEffect(() => {
     if (grupo) {
+      const controller = new AbortController();
+
       async function acharParticipantes() {
+        if (!atualizarGrupo && participantesCacheRef.current.has(grupo.id_grupo)) {
+          setParticipantes(participantesCacheRef.current.get(grupo.id_grupo));
+          return;
+        }
+
         const res = await fetch(
           `https://link-us-virid.vercel.app/_/backend/grupo/acharUsuarios/${grupo.id_grupo}`,
           {
@@ -18,6 +26,7 @@ function GrupoInfo({ grupo, setModal }) {
               "Content-Type": "application/json",
               Authorization: `bearer ${token}`,
             },
+            signal: controller.signal,
           }
         );
 
@@ -26,10 +35,20 @@ function GrupoInfo({ grupo, setModal }) {
             "Erro ao tentar achar os participantes: ",
             await res.text()
           );
-        else setParticipantes(await res.json());
+        else {
+          const json = await res.json();
+          participantesCacheRef.current.set(grupo.id_grupo, json);
+          setParticipantes(json);
+        }
       }
 
-      acharParticipantes();
+      acharParticipantes().catch((error) => {
+        if (error.name !== "AbortError") {
+          console.error("Erro ao buscar participantes do grupo:", error);
+        }
+      });
+
+      return () => controller.abort();
     }
   }, [grupo, atualizarGrupo, token]);
 

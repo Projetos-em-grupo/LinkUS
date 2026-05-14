@@ -22,6 +22,7 @@ function Conversas({ conversa, setConversa, setModal }) {
   const [modalErro, setModalErro] = useState(null);
   const [podeCriarGrupo, setPodeCriarGrupo] = useState(true);
   const bottomRef = useRef(null);
+  const mensagensCacheRef = useRef(new Map());
 
   function abrirConversaPrivada(conexao) {
     if (!conexao) return;
@@ -42,6 +43,8 @@ function Conversas({ conversa, setConversa, setModal }) {
     };
 
     try {
+      setPodeCriarGrupo(false);
+
       const result = await fetch("https://link-us-virid.vercel.app/_/backend/grupo/criarGrupo", {
         method: "POST",
         body: JSON.stringify(data),
@@ -56,28 +59,38 @@ function Conversas({ conversa, setConversa, setModal }) {
         return;
       }
 
-      for (const integrante of novosIntegrantes) {
-        const res = await fetch("https://link-us-virid.vercel.app/_/backend/grupo/participarGrupo", {
-          method: "POST",
-          body: JSON.stringify({
-            nomeUsuario: integrante.nome,
-            nomeGrupo: novoGrupo.nome,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const resultadosParticipantes = await Promise.all(
+          novosIntegrantes.map(async (integrante) => {
+            const res = await fetch(
+              "https://link-us-virid.vercel.app/_/backend/grupo/participarGrupo",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  nomeUsuario: integrante.nome,
+                  nomeGrupo: novoGrupo.nome,
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
 
-        if (res.status !== 200) {
-          console.error(
-            "Erro ao tentar adicionar participante: ",
-            await res.text()
-          );
-        } else {
-          acharConexoesPorUsuario(usuario.nome);
+            if (res.status !== 200) {
+              console.error(
+                "Erro ao tentar adicionar participante: ",
+                await res.text()
+              );
+              return false;
+            }
+
+            return true;
+          })
+        );
+
+        if (resultadosParticipantes.some(Boolean)) {
+          await acharConexoesPorUsuario(usuario.nome, { force: true });
         }
-      }
 
       const grupoConversa = {
         nome: novoGrupo.nome,
@@ -87,12 +100,14 @@ function Conversas({ conversa, setConversa, setModal }) {
 
       setConversa(grupoConversa);
       setModal(null);
-      if (acharGruposPorUsuario) acharGruposPorUsuario(usuario.nome);
+      if (acharGruposPorUsuario) acharGruposPorUsuario(usuario.nome, { force: true });
       setNovoGrupo({});
       setNovosIntegrantes([]);
       setNovaMensagem(false);
     } catch (error) {
       console.error("Erro interno do servidor: " + error);
+    } finally {
+      setPodeCriarGrupo(true);
     }
   }
 
@@ -155,13 +170,22 @@ function Conversas({ conversa, setConversa, setModal }) {
 
   useEffect(() => {
     if (conversa) {
+      const controller = new AbortController();
+      const cacheKey = `${conversa.tipo}:${conversa.nome}`;
+
       async function acharMensagens() {
+        if (!atualizarMensagens && mensagensCacheRef.current.has(cacheKey)) {
+          setMensagens(mensagensCacheRef.current.get(cacheKey));
+          return;
+        }
+
         const result = await fetch(
           `https://link-us-virid.vercel.app/_/backend/mensagem/listarMensagensConversa/${usuario.nome}/${conversa.nome}/${conversa.tipo}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
+            signal: controller.signal,
           }
         );
 
@@ -170,11 +194,19 @@ function Conversas({ conversa, setConversa, setModal }) {
             "Erro ao achar as mensagens da conversa: " + (await result.text())
           );
         else {
-          setMensagens(await result.json());
+          const json = await result.json();
+          mensagensCacheRef.current.set(cacheKey, json);
+          setMensagens(json);
         }
       }
 
-      acharMensagens();
+      acharMensagens().catch((error) => {
+        if (error.name !== "AbortError") {
+          console.error("Erro ao buscar mensagens:", error);
+        }
+      });
+
+      return () => controller.abort();
     }
   }, [conversa, atualizarMensagens, token, usuario?.nome]);
 
@@ -601,14 +633,12 @@ function Conversas({ conversa, setConversa, setModal }) {
               <button
                 onClick={() => {
                   if (novoGrupo.nome?.trim()) {
-                    setPodeCriarGrupo(false);
                     criarGrupo();
-                    setPodeCriarGrupo(true);
                   }
                 }}
                 disabled={!novoGrupo.nome?.trim() || !podeCriarGrupo}
                 className={`flex-1 px-4 py-3 rounded-lg font-poppins font-medium transition-colors ${
-                  novoGrupo.nome?.trim() || podeCriarGrupo
+                  novoGrupo.nome?.trim() && podeCriarGrupo
                     ? "bg-cyan-500 text-white hover:bg-cyan-600 cursor-pointer"
                     : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
                 }`}
