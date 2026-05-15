@@ -20,6 +20,90 @@ const BLOCKED_USER_AGENT_PATTERNS = [
 
 const PUBLIC_PATHS = new Set(["/", "/health"]);
 
+const RATE_LIMIT_CONFIG = [
+  {
+    pattern: /^\/usuario\/logarUsuario$/,
+    method: "POST",
+    windowMs: 60_000,
+    maxRequests: 5,
+  },
+
+  {
+    pattern: /^\/usuario\/criarUsuario$/,
+    method: "POST",
+    windowMs: 60_000,
+    maxRequests: 3,
+  },
+
+  {
+    pattern: /^\/postagem\/criarPostagem$/,
+    method: "POST",
+    windowMs: 60_000,
+    maxRequests: 3,
+  },
+
+  {
+    pattern: /^\/comentario\/criarComentarioPostagem$/,
+    method: "POST",
+    windowMs: 60_000,
+    maxRequests: 10,
+  },
+
+  {
+    pattern: /^\/mensagem\/mandarMensagem$/,
+    method: "POST",
+    windowMs: 60_000,
+    maxRequests: 120,
+  },
+
+  {
+    pattern: /^\/mensagem\/mandarMensagemGrupo$/,
+    method: "POST",
+    windowMs: 60_000,
+    maxRequests: 120,
+  },
+
+  {
+    pattern: /^\/interacao\/criarInteracao$/,
+    method: "POST",
+    windowMs: 60_000,
+    maxRequests: 80,
+  },
+
+  {
+    pattern: /^\/grupo\/criarGrupo$/,
+    method: "POST",
+    windowMs: 60_000,
+    maxRequests: 5,
+  },
+
+  {
+    pattern: /^\/conexao\/enviarSolicitacao$/,
+    method: "POST",
+    windowMs: 60_000,
+    maxRequests: 15,
+  },
+
+  {
+    pattern: /^\/postagem\/acharPostagens$/,
+    method: "GET",
+    windowMs: 60_000,
+    maxRequests: 200,
+  },
+
+  {
+    pattern: /^\/usuario\/acharUsuarios$/,
+    method: "GET",
+    windowMs: 60_000,
+    maxRequests: 100,
+  },
+];
+
+const DEFAULT_RATE_LIMIT = {
+  windowMs: 60_000,
+  maxRequests: 20,
+};
+
 function normalizarOrigem(origin) {
   return origin?.trim().replace(/\/$/, "");
 }
@@ -70,6 +154,16 @@ function origemPermitida(req, allowedOrigins) {
   return false;
 }
 
+function obterConfiguracaoRateLimit(path, method) {
+  return (
+    RATE_LIMIT_CONFIG.find(
+      (config) =>
+        config.pattern.test(path) &&
+        config.method === method
+    ) || DEFAULT_RATE_LIMIT
+  );
+}
+
 export function createCorsOptions() {
   const allowedOrigins = lerOrigensPermitidas();
 
@@ -116,10 +210,7 @@ export function bloquearClientesExternos(req, res, next) {
   return next();
 }
 
-export function criarLimitadorDeRequisicoes({
-  windowMs = Number(process.env.RATE_LIMIT_WINDOW_MS || 80000),
-  maxRequests = Number(process.env.RATE_LIMIT_MAX_REQUESTS || 24),
-} = {}) {
+export function criarLimitadorDeRequisicoes() {
   const requestsByIp = new Map();
 
   return function limitadorDeRequisicoes(req, res, next) {
@@ -131,22 +222,35 @@ export function criarLimitadorDeRequisicoes({
       return next();
     }
 
+    const fullPath = `${req.baseUrl}${req.path}`;
+
+    const { windowMs, maxRequests } =
+      obterConfiguracaoRateLimit(fullPath, req.method);
+
     const now = Date.now();
     const ip = extrairIp(req);
-    const requestTimestamps = requestsByIp.get(ip) || [];
+
+    const uniqueKey = `${ip}:${fullPath}`;
+
+    const requestTimestamps = requestsByIp.get(uniqueKey) || [];
+
     const validTimestamps = requestTimestamps.filter(
       (timestamp) => now - timestamp < windowMs
     );
 
     if (validTimestamps.length >= maxRequests) {
       res.setHeader("Retry-After", String(Math.ceil(windowMs / 1000)));
-      return res
-        .status(429)
-        .send("Muitas requisicoes em pouco tempo. Tente novamente em instantes.");
+
+      return res.status(429).send({
+        erro: "Muitas requisicoes em pouco tempo",
+        limite: maxRequests,
+        janelaMs: windowMs,
+      });
     }
 
     validTimestamps.push(now);
-    requestsByIp.set(ip, validTimestamps);
+
+    requestsByIp.set(uniqueKey, validTimestamps);
 
     return next();
   };

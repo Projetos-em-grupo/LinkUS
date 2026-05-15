@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../css/header.css";
+
 import { useAutenticador } from "./providers/useAutenticador";
 import Loading from "./Loading.jsx";
 
@@ -33,7 +33,7 @@ function Header({ tipo, setTermo }) {
 
   return (
     <header className="flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-6 shadow-md md:px-15">
-      <Link to="/">
+      <Link to="/post">
         <img src="./icons/logo.svg" alt="LinkUS logo" className="h-12 w-auto" />
       </Link>
       <div className="mx-4 flex-1 md:mx-12">
