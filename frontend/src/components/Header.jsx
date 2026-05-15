@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import "../css/header.css";
 import { useAutenticador } from "./providers/useAutenticador";
 import Loading from "./Loading.jsx";
 
