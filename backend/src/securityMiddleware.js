@@ -222,7 +222,8 @@ export function criarLimitadorDeRequisicoes() {
       return next();
     }
 
-    const fullPath = `${req.baseUrl}${req.path}`;
+    const fullPath = req.originalUrl.split("?")[0];
+    console.log(`Requisicao: ${req.method} ${fullPath} - IP: ${extrairIp(req)}`);
 
     const { windowMs, maxRequests } =
       obterConfiguracaoRateLimit(fullPath, req.method);
@@ -230,7 +231,7 @@ export function criarLimitadorDeRequisicoes() {
     const now = Date.now();
     const ip = extrairIp(req);
 
-    const uniqueKey = `${ip}:${fullPath}`;
+    const uniqueKey = `${ip}:${req.method}:${fullPath}`;
 
     const requestTimestamps = requestsByIp.get(uniqueKey) || [];
 
