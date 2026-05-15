@@ -1,0 +1,32 @@
+#solicitacoes {
+  margin-top: 24px;
+}
+
+#solicitacoes h2 {
+  margin-bottom: 20px;
+}
+
+#solicitacoes li div {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+#solicitacoes li div:nth-child(2) {
+  margin-left: 12px;
+  gap: 20px;
+}
+
+#solicitacoes li p {
+  font: 400 1.4rem / 1.3 "Poppins";
+}
+
+#solicitacoes li a {
+  cursor: pointer;
+  padding: 12px 20px;
+  border-radius: 32px;
+  background-color: var(--p7);
+  color: var(--c3);
+  font: 400 1.1rem /1.2 "Poppins";
+}

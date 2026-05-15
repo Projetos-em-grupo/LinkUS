@@ -53,10 +53,67 @@ export async function criarInteracao(req, res) {
   }
 }
 
+export async function deletarInteracao(req, res) {
+  const { nome, id_postagem, id_comentario } = req.params;
+  let deletarInteracaoSQL;
+  if (id_comentario === "nenhum")
+    deletarInteracaoSQL =
+      "DELETE FROM interacao i USING usuario u WHERE i.fk_usuario = u.id_usuario AND u.nome = ? AND i.fk_postagem = ? AND i.fk_comentario is null";
+  else
+    deletarInteracaoSQL =
+      "DELETE FROM interacao i USING usuario u WHERE i.fk_usuario = u.id_usuario AND u.nome = ? AND i.fk_postagem = ? AND i.fk_comentario = ?";
+
+  try {
+    const params =
+      id_comentario === "nenhum"
+        ? [nome, id_postagem]
+        : [nome, id_postagem, id_comentario];
+    const [resultDeletarInteracao] = await pool.query(
+      deletarInteracaoSQL,
+      params
+    );
+    if (!resultDeletarInteracao)
+      return res.status(404).send("Usuário não encontrado");
+    return res.status(200).send("Interação removida com sucesso");
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Erro interno do servidor");
+  }
+}
+
+export async function atualizarInteracao(req, res) {
+  const { nome, id_postagem, interacao, id_comentario } = req.body || null;
+  let atualizarInteracaoSQL;
+  if (!id_comentario)
+    atualizarInteracaoSQL =
+      "UPDATE interacao i SET tipo = ? FROM usuario u WHERE i.fk_usuario = u.id_usuario AND u.nome = ? AND i.fk_postagem = ? AND i.fk_comentario is null";
+  else
+    atualizarInteracaoSQL =
+      "UPDATE interacao i SET tipo = ? FROM usuario u WHERE i.fk_usuario = u.id_usuario AND u.nome = ? AND i.fk_postagem = ? AND i.fk_comentario = ?";
+
+  try {
+    const params = !id_comentario
+      ? [interacao, nome, id_postagem]
+      : [interacao, nome, id_postagem, id_comentario];
+    const [resultAtualizarInteracao] = await pool.query(
+      atualizarInteracaoSQL,
+      params
+    );
+
+    if (!resultAtualizarInteracao)
+      return res.status(404).send("Usuário não encontrado");
+
+    return res.status(200).send("Interação no post atualizada com sucesso");
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Erro interno do servidor");
+  }
+}
+
 export async function temInteracaoPost(req, res) {
   const { email, id_postagem } = req.body;
   const temInteracaoSQL =
-    "SELECT i.tipo from interacao i join usuario u on u.id_usuario = i.fk_usuario where u.email = ? and i.fk_postagem = ?";
+    "SELECT i.tipo from interacao i join usuario u on u.id_usuario = i.fk_usuario where u.email = ? and i.fk_postagem = ? and fk_comentario is null";
 
   try {
     const [resultTemInteracao] = await pool.query(temInteracaoSQL, [
@@ -73,6 +130,7 @@ export async function temInteracaoPost(req, res) {
     return res.status(200).send({ tipo: resultTemInteracao[0].tipo });
   } catch (error) {
     console.error(error);
+    return res.status(500).send("Erro interno do servidor");
   }
 }
 
@@ -90,6 +148,6 @@ export async function temInteracaoComentario(req, res) {
     return res.status(200).send({ tipo: result[0].tipo });
   } catch (error) {
     console.error(error);
-    return res.status(500).send("Erro ao verificar interação no comentário");
+    return res.status(500).send("Erro interno do servidor");
   }
 }

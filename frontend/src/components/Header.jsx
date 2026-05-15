@@ -1,8 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../css/header.css";
+import { useAutenticador } from "./providers/useAutenticador";
+import Loading from "./Loading.jsx";
 
 function Header({ tipo, setTermo }) {
+  const navigate = useNavigate();
+  const { usuario, logout } = useAutenticador();
+
   if (tipo === "pagina-inicial" || tipo === "cadastro")
     return (
       <header>
@@ -20,6 +25,8 @@ function Header({ tipo, setTermo }) {
       </header>
     );
 
+  if (!usuario) return <Loading />;
+
   return (
     <header>
       <Link to="/">
@@ -29,17 +36,30 @@ function Header({ tipo, setTermo }) {
         <input
           type="text"
           placeholder="use # para interesses @ para pessoas"
+          id="search"
           onChange={(e) => setTermo(e.target.value)}
         />
         <img src="./icons/pesquisa.svg" alt="Ícone de pesquisa" />
       </div>
       <div>
-        <Link>
+        <Link to="/mensagem">
           <img src="./icons/conversa.svg" alt="Ícone de conversas" />
         </Link>
-        <Link>
-          <img src="./icons/perfil.svg" alt="Ícone de perfil" />
+        <Link to="/perfil">
+          <img
+            id="foto-perfil"
+            src={usuario.url_foto || "./icons/perfil.svg"}
+            alt="Ícone de perfil"
+          />
         </Link>
+        <img
+          src="./icons/logout.svg"
+          alt="Ícone para sair da sua conta"
+          onClick={() => {
+            navigate("/");
+            logout();
+          }}
+        />
       </div>
     </header>
   );

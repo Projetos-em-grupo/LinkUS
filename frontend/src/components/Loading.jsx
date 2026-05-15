@@ -3,7 +3,7 @@ import "../css/loading.css";
 
 function Loading() {
   return (
-    <div className="modal">
+    <div className="modal" id="loading">
       <div className="modal-content">
         <h2>Carregando</h2>
         <div>

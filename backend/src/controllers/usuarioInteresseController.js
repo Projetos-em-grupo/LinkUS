@@ -6,33 +6,28 @@ export async function criarUsuarioInteresse(req, res) {
   const acharInteresseSQL = "SELECT * from interesse where nome = ?";
   const criarInteresseSQL = "INSERT INTO interesse(nome) values(?)";
   const criarUsuarioInteresseSQL =
-    "INSERT IGNORE INTO usuario_interesse(fk_interesse, fk_usuario) values(?, ?)";
+    "INSERT INTO usuario_interesse(fk_interesse, fk_usuario) values(?, ?)";
 
   if (!body?.email || !body?.interesse)
     return res.status(400).send("informe todos os campos");
 
   try {
+    const interesse = body.interesse.toUpperCase();
     const [resultAcharUsuario] = await pool.query(acharUsuarioSQL, body.email);
     if (!resultAcharUsuario[0])
       return res.status(404).send("usuario não encontrado");
 
-    let [resultAcharInteresse] = await pool.query(
-      acharInteresseSQL,
-      body.interesse.toUpperCase()
-    );
+    let [resultAcharInteresse] = await pool.query(acharInteresseSQL, interesse);
 
     if (!resultAcharInteresse[0]) {
-      await pool.query(criarInteresseSQL, body.interesse.toUpperCase());
-      [resultAcharInteresse] = await pool.query(
-        acharInteresseSQL,
-        body.interesse.toUpperCase()
-      );
+      await pool.query(criarInteresseSQL, interesse);
+      [resultAcharInteresse] = await pool.query(acharInteresseSQL, interesse);
     }
 
-    const [resultCriarUsuarioInteresse] = await pool.query(
-      criarUsuarioInteresseSQL,
-      [resultAcharInteresse[0].id_interesse, resultAcharUsuario[0].id_usuario]
-    );
+    await pool.query(criarUsuarioInteresseSQL, [
+      resultAcharInteresse[0].id_interesse,
+      resultAcharUsuario[0].id_usuario,
+    ]);
 
     return res.status(201).send("Relação entre usuário e interesse criada");
   } catch (error) {

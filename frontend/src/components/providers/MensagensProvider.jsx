@@ -12,7 +12,7 @@ export function MensagensProvider({ children }) {
     setMensagensUsuarioLoading(true);
     try {
       const result = await fetch(
-        `http://localhost:5000/mensagem/listarConversasUsuario/${email}`,
+        `https://link-us-virid.vercel.app/_/backend/mensagem/listarConversasUsuario/${email}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -22,7 +22,11 @@ export function MensagensProvider({ children }) {
 
       if (result.status !== 200)
         console.log("Erro de requisição: " + (await result.text()));
-      else setMensagensUsuario(await result.json());
+      else {
+        const json = await result.json();
+        console.log(json);
+        setMensagensUsuario(json);
+      }
     } catch (error) {
       console.error("Erro de requisição" + error);
     } finally {

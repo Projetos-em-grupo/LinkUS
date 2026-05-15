@@ -1,0 +1,29 @@
+#mensagens-usuario {
+  margin-top: 24px;
+  overflow-y: auto;
+  max-height: 78vh;
+  scrollbar-width: none;
+}
+
+#mensagens-usuario::-webkit-scrollbar {
+  display: none;
+}
+
+#conversa-atual {
+  background-color: var(--c1);
+}
+
+#mensagens-usuario li {
+  padding: 24px 40px;
+  border-radius: 20px;
+  margin-right: 60px;
+  display: flex;
+  gap: 12px;
+  font: 300 1.2rem / 1.3 "Poppins";
+  margin-bottom: 24px;
+}
+
+#mensagens-usuario li div {
+  display: flex;
+  flex-direction: column;
+}

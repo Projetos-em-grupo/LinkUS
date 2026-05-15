@@ -53,20 +53,20 @@ export async function criarGrupo(req, res) {
 }
 
 export async function participarGrupo(req, res) {
-  const { nome, email } = req.body;
-  const acharUsuarioPorEmailSQL =
-    "SELECT id_usuario from usuario where email = ?";
+  const { nomeGrupo, nomeUsuario } = req.body;
+  const acharUsuarioPorNomeSQL =
+    "SELECT id_usuario from usuario where nome = ?";
   const participarGrupoSQL =
     "INSERT INTO participante(fk_grupo, fk_participante) values(?, ?)";
 
   try {
-    const [resultAcharUsuario] = await pool.query(acharUsuarioPorEmailSQL, [
-      email,
+    const [resultAcharUsuario] = await pool.query(acharUsuarioPorNomeSQL, [
+      nomeUsuario,
     ]);
     if (!resultAcharUsuario[0])
       return res.status(404).send("Usuário não encontrado");
 
-    const resultAcharGrupoPorNome = await acharGrupoPorNome(nome);
+    const resultAcharGrupoPorNome = await acharGrupoPorNome(nomeGrupo);
     if (!resultAcharGrupoPorNome[0])
       return res.status(404).send("Grupo não encontrado");
 
@@ -86,29 +86,29 @@ export async function participarGrupo(req, res) {
 }
 
 export async function administrarParticipante(req, res) {
-  const { email, nome, emailAdmin, funcao } = req.body;
-  const acharUsuarioPorEmailSQL =
-    "SELECT id_usuario from usuario where email = ?";
+  const { nomeUsuario, nomeGrupo, emailAdmin, funcao } = req.body;
+  const acharUsuarioPorNomeSQL =
+    "SELECT id_usuario from usuario where nome = ?";
   const acharAdminPorEmailENomeDoGrupoSQL =
     "SELECT u.id_usuario, p.funcao from usuario u join participante p on p.fk_participante = u.id_usuario join grupo g on g.id_grupo = p.fk_grupo where u.email = ? and g.nome = ?";
   const administrarParticipanteSQL =
     "UPDATE participante set funcao = ? where fk_participante = ? and fk_grupo = ?";
 
   try {
-    const resultAcharGrupoPorNome = await acharGrupoPorNome(nome);
+    const resultAcharGrupoPorNome = await acharGrupoPorNome(nomeGrupo);
     if (!resultAcharGrupoPorNome[0])
       return res.status(404).send("Grupo não encontrado");
-    const [resultAcharUsuarioPorEmail] = await pool.query(
-      acharUsuarioPorEmailSQL,
-      [email]
+    const [resultAcharUsuarioPorNome] = await pool.query(
+      acharUsuarioPorNomeSQL,
+      [nomeUsuario]
     );
 
-    if (!resultAcharUsuarioPorEmail[0])
+    if (!resultAcharUsuarioPorNome[0])
       return res.status(404).send("Usuário não encontrado");
 
     const [resultAcharAdminPorEmail] = await pool.query(
       acharAdminPorEmailENomeDoGrupoSQL,
-      [emailAdmin, nome]
+      [emailAdmin, nomeGrupo]
     );
 
     if (!resultAcharAdminPorEmail[0])
@@ -121,7 +121,7 @@ export async function administrarParticipante(req, res) {
       administrarParticipanteSQL,
       [
         funcao,
-        resultAcharUsuarioPorEmail[0].id_usuario,
+        resultAcharUsuarioPorNome[0].id_usuario,
         resultAcharGrupoPorNome[0].id_grupo,
       ]
     );
@@ -177,6 +177,26 @@ export async function acharGruposPorUsuario(req, res) {
       return res.status(400).send("Erro ao tentar achar os grupos do usuário");
 
     return res.status(200).send(resultAcharGrupoPorUsuario);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Erro interno do servidor");
+  }
+}
+
+export async function acharUsuariosPorGrupo(req, res) {
+  const { id_grupo } = req.params;
+  const acharUsuarioPorGrupoSQL =
+    "SELECT u.url_foto, u.nome, p.funcao from participante p join usuario u on u.id_usuario = p.fk_participante where p.fk_grupo = ?";
+
+  try {
+    const [resultAcharUsuarioPorGrupo] = await pool.query(
+      acharUsuarioPorGrupoSQL,
+      [id_grupo]
+    );
+    if (!resultAcharUsuarioPorGrupo[0])
+      return res.status(404).send("Não foram encontrados os usuários fo grupo");
+
+    return res.status(200).send(resultAcharUsuarioPorGrupo);
   } catch (error) {
     console.error(error);
     return res.status(500).send("Erro interno do servidor");

@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "./Header";
 import { Link, useNavigate } from "react-router-dom";
 import "../css/acessar.css";
+import { useAutenticador } from "./providers/useAutenticador";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function Cadastrar() {
+  const { usuario, token } = useAutenticador();
+  const [dataNascimento, setDataNascimento] = useState();
   const navigate = useNavigate();
+
+  if (usuario || token) {
+    navigate("/post");
+    return null;
+  }
 
   return (
     <article aria-label="cadastrar" id="cadastrar">
@@ -22,13 +32,13 @@ function Cadastrar() {
               nome: data.get("nome"),
               email: data.get("email"),
               senha: data.get("senha"),
-              data_nascimento: data.get("data"),
+              data_nascimento: dataNascimento?.toISOString().split("T")[0],
             };
 
             console.log(dados);
             try {
               const result = await fetch(
-                "http://localhost:5000/usuario/criarUsuario",
+                "https://link-us-virid.vercel.app/_/backend/usuario/criarUsuario",
                 {
                   method: "POST",
                   body: JSON.stringify(dados),
@@ -59,11 +69,13 @@ function Cadastrar() {
             placeholder="nome de usuário"
             name="nome"
           />
-          <input
-            required
-            type="text"
-            placeholder="data de nascimento"
-            name="data"
+          <DatePicker
+            selected={dataNascimento}
+            onChange={(date) => setDataNascimento(date)}
+            placeholderText="Selecione sua data de nascimento"
+            dateFormat="dd/MM/yyyy"
+            className="input-date"
+            maxDate={new Date()}
           />
           <input required type="email" placeholder="email" name="email" />
           <input required type="password" placeholder="senha" name="senha" />

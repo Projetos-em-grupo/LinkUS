@@ -9,7 +9,9 @@
 #conversas li {
   display: flex;
   gap: 12px;
-  justify-content: center;
+  justify-content: start;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
 #conversas li img {

@@ -1,17 +1,20 @@
-.modal-content h2 {
+.modal-content h2,
+#loading .modal-content h2 {
   text-align: center;
   font: 600 2.7rem/1.2 "Lato";
   margin-bottom: 16px;
 }
 
-.modal-content div {
+.modal-content div,
+#loading .modal-content div {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 20px;
 }
 
-.modal-content p {
+.modal-content p,
+#loading .modal-content p {
   text-align: center;
   font: 400 1.3rem/1.3 "Poppins";
 }

@@ -25,6 +25,13 @@ h2 {
   margin: 8px 0px 0px 16px;
 }
 
+#sidebar li {
+  margin-top: 12px;
+  display: flex;
+  gap: 12px;
+  cursor: pointer;
+}
+
 #sidebar ul p:first-child {
   font: 400 1.4rem/1.2 "Lato";
 }

@@ -5,6 +5,7 @@ import {
   participarGrupo,
   acharGrupos,
   acharGruposPorUsuario,
+  acharUsuariosPorGrupo,
 } from "../controllers/grupoController.js";
 import { verificarToken } from "../middlewareAutenticador.js";
 
@@ -15,5 +16,6 @@ router.post("/participarGrupo", verificarToken, participarGrupo);
 router.put("/administrarParticipante", verificarToken, administrarParticipante);
 router.get("/acharGrupos", acharGrupos);
 router.get("/acharGrupos/:nome", acharGruposPorUsuario);
+router.get("/acharUsuarios/:id_grupo", acharUsuariosPorGrupo);
 
 export default router;

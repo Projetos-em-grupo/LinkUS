@@ -1,0 +1,203 @@
+#nova-mensagem {
+  margin-top: 100px;
+}
+
+#nova-mensagem h2 {
+  font: 600 2rem /1.3 "Lato";
+  margin-bottom: 0px;
+}
+
+#nova-mensagem > p {
+  font: 400 1.3rem /1.2 "Poppins";
+  margin-top: 16px;
+}
+
+#nova-mensagem > a p {
+  cursor: pointer;
+  display: inline-block;
+  color: var(--c2);
+  margin-top: 20px;
+  padding: 16px 36px;
+  font: 400 1rem /1.2 "Poppins";
+  border-radius: 32px;
+  background-color: var(--p7);
+}
+
+#nova-mensagem ul img {
+  width: 50px;
+  height: 50px;
+}
+
+#nova-mensagem ul {
+  margin-top: 20px;
+}
+
+#nova-mensagem li {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+#mensagens-atuais > div {
+  margin-right: 48px;
+  margin-top: 26px;
+}
+
+#mensagens-atuais::-webkit-scrollbar {
+  display: none;
+}
+
+#mensagens-atuais div:first-child {
+  display: flex;
+  gap: 16px;
+  position: relative;
+  align-items: center;
+  justify-content: space-between;
+  font: 300 0.9rem /1.2 "Poppins";
+}
+
+#mensagens-atuais ul div {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#mensagens-atuais ul li.enviada div {
+  justify-content: end;
+}
+
+#mensagens-atuais ul {
+  max-height: 50vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  margin-right: 48px;
+}
+
+#mensagens-atuais ul::-webkit-scrollbar {
+  display: none;
+}
+
+#mensagens-atuais li {
+  margin-bottom: 12px;
+  font: 300 1rem / 1.3 "Poppins";
+  width: fit-content;
+  cursor: pointer;
+  position: relative;
+}
+
+#mensagens-atuais li.enviada {
+  margin-left: auto;
+  width: fit-content;
+}
+
+#mensagens-atuais li.enviada > p {
+  padding: 12px 24px;
+  border-radius: 30px 30px 5px 30px;
+  background-color: var(--c2);
+  border: 2px solid var(--c4);
+}
+
+#mensagens-atuais li.enviada div p,
+#mensagens-atuais li.recebida div p {
+  font: 300 0.9rem / 1.3 "Poppins";
+  color: var(--c8);
+}
+
+#mensagens-atuais li.recebida {
+  margin-right: auto;
+}
+
+#mensagens-atuais li.recebida > p {
+  padding: 12px 24px;
+  border-radius: 30px 30px 30px 5px;
+  background-color: var(--c2);
+  border: 2px solid var(--c4);
+}
+
+#mensagens-atuais > div:last-child img:last-child {
+  cursor: pointer;
+  position: absolute;
+  right: 16px;
+  top: 10px;
+}
+
+#mensagens-atuais > div:first-child:after {
+  display: block;
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 0.5px;
+  background-color: var(--c14);
+  bottom: -12px;
+}
+
+#mensagens-atuais > div:last-child {
+  margin-top: 16px;
+  position: relative;
+}
+
+#mensagens-atuais div:last-child input,
+#mensagens-atuais div:last-child input:focus-visible {
+  padding: 16px 112px 16px 28px;
+  outline: none;
+  border: 2px solid var(--c3);
+  border-radius: 32px;
+  background-color: var(--c1);
+}
+
+#mensagens-atuais > div:last-child img {
+  position: relative;
+}
+
+#mensagens-atuais li #modal-excluir {
+  background-color: var(--c9);
+  padding: 8px 16px;
+  position: absolute;
+  top: -28px;
+  white-space: nowrap;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#mensagens-atuais li #modal-excluir p {
+  color: var(--c1);
+  font-weight: 400;
+}
+
+#modal-mensagem > div > h2 {
+  margin-top: 20px;
+  text-align: start;
+}
+
+#modal-mensagem .ativo {
+  border-radius: 12px;
+  padding: 12px 12px;
+  background-color: var(--c12);
+}
+
+#modal-mensagem {
+  white-space: nowrap;
+}
+
+#modal-mensagem h2 {
+  text-align: start;
+}
+
+#modal-mensagem a {
+  font: 500 1rem/1.2 "Poppins";
+  padding: 12px 28px;
+  color: var(--c14);
+  margin-left: 160px;
+  border-radius: 20px;
+  background-color: var(--c2);
+}
+
+#modal-mensagem img {
+  border-radius: 24px;
+}

@@ -4,6 +4,7 @@ import {
   logarUsuario,
   acharUsuariosPorInteresse,
   acharUsuarios,
+  atualizarUsuario,
 } from "../controllers/usuarioController.js";
 import { verificarToken } from "../middlewareAutenticador.js";
 
@@ -17,5 +18,6 @@ router.get(
   acharUsuariosPorInteresse
 );
 router.get("/acharUsuarios", acharUsuarios);
+router.put("/atualizarUsuario", atualizarUsuario);
 
 export default router;

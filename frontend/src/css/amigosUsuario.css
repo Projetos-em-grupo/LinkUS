@@ -1,0 +1,11 @@
+#amigos-usuario {
+  margin-top: 24px;
+}
+
+#amigos-usuario li {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font: 500 1.4rem / 1.2 "Poppins";
+  margin-bottom: 20px;
+}

@@ -1,0 +1,105 @@
+#grupo-info {
+  display: flex;
+  flex-direction: column;
+  margin: 32px 48px 0px 0px;
+  height: 480px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+#grupo-info::-webkit-scrollbar {
+  display: none;
+}
+
+#grupo-info span {
+  display: flex;
+  background-color: var(--c1);
+  box-shadow: inset 0 -60px #fff;
+}
+
+#grupo-info span img {
+  margin: 60px auto 0px auto;
+  height: 100px;
+  width: 100px;
+}
+
+#grupo-info > p {
+  margin: auto;
+  font: 600 1rem / 1.3 "Poppins";
+  color: var(--c14);
+  margin-top: 8px;
+}
+
+#grupo-info > p + p {
+  font: 300 0.8rem / 1.3 "Poppins";
+}
+
+#grupo-info div {
+  margin: 12px 0px;
+  padding: 14px 24px;
+  border: 2px solid var(--c2);
+}
+
+#grupo-info div h2 {
+  font: 500 0.9rem / 1.3 "Poppins";
+  color: var(--c14);
+  margin-bottom: 12px;
+}
+
+#grupo-info div p {
+  font: 400 0.9rem / 1.3 "Poppins";
+}
+
+#grupo-info div + p {
+  margin: 12px 0px 12px 0px;
+  font: 300 0.9rem / 1.3 "Poppins";
+}
+
+#grupo-info li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+#grupo-info li::after {
+  content: "";
+  height: 0.5px;
+  background-color: var(--c14);
+  width: 100%;
+  display: block;
+  position: absolute;
+  bottom: -8px;
+}
+
+#grupo-info li img {
+  width: 50px;
+  height: 50px;
+}
+
+#grupo-info li a {
+  justify-content: flex-end;
+  margin-left: auto;
+  padding: 4px 12px;
+  border-radius: 5px;
+  font: 300 1rem / 1.3 "Poppins";
+  white-space: nowrap;
+}
+
+#grupo-info li a.admin {
+  background-color: var(--p5);
+  color: var(--c1);
+}
+
+#grupo-info li a.user {
+  color: var(--p5);
+  border: 1px solid var(--p5);
+  cursor: pointer;
+}
+
+#grupo-info li a.user:hover {
+  background-color: var(--p5);
+  color: var(--c1);
+  border-color: var(--c1);
+}

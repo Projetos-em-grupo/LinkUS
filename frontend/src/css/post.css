@@ -1,4 +1,4 @@
 article > div {
   display: grid;
-  grid-template-columns: 1fr 2.3fr 1fr;
+  grid-template-columns: 1fr 1.8fr 1fr;
 }

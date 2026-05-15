@@ -49,6 +49,19 @@
   color: var(--c2);
 }
 
+.acessar-div .input-date {
+  width: 150%;
+}
+
+.acessar-div .react-datepicker__current-month {
+  font-size: 1.4rem;
+}
+
+.acessar-div .react-datepicker__navigation--previous {
+  top: 7px;
+  left: 8px;
+}
+
 .acessar-div input::placeholder {
   color: var(--c4);
 }
@@ -63,7 +76,7 @@
   text-decoration: underline;
 }
 
-.acessar-div button {
+.acessar-div form > button {
   background-color: var(--c1);
   font: 600 1rem/1.3 "Poppins";
   width: 95%;
@@ -71,4 +84,5 @@
   border-radius: 24px;
   padding: 14px 12px;
   cursor: pointer;
+  border: 2px solid var(--c9);
 }

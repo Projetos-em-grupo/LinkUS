@@ -22,8 +22,6 @@ export async function enviarSolicitacao(req, res) {
     if (!resultAcharDestinatario[0])
       return res.status(404).send("Destinatário não encontrado");
 
-    console.log(resultAcharRemetente[0].id_usuario);
-    console.log(resultAcharDestinatario[0].id_usuario);
     const [resultEnviarSolicitacao] = await pool.query(enviarSolicitacaoSQL, [
       resultAcharRemetente[0].id_usuario,
       resultAcharDestinatario[0].id_usuario,
@@ -78,6 +76,7 @@ export async function aceitarSolicitacao(req, res) {
 
 export async function recusarSolicitacao(req, res) {
   const { remetente, destinatario } = req.body;
+  console.log(remetente);
 
   const recusarSolicitacaoSQL =
     "DELETE from conexao where usuario_1 = ? and usuario_2 = ?";
@@ -113,23 +112,25 @@ export async function recusarSolicitacao(req, res) {
 
 export async function acharConexoes(req, res) {
   const { nome } = req.params;
+
   const acharUsuarioPorNomeSQL =
     "SELECT id_usuario from usuario where nome = ?";
   const acharConexoesSQL =
-    "SELECT u.nome from usuario u join conexao c on c.usuario_1 = ? or c.usuario_2 = ? and usuario_id != ? where c.status = 'aceito'";
+    "select u.nome, u.url_foto, c.status, CASE WHEN u.id_usuario = usuario_1 THEN 'remetente' ELSE 'destinatario' END as requisicao from conexao c join usuario u on (usuario_1 = u.id_usuario or usuario_2 = u.id_usuario) where (usuario_1 = ? or usuario_2 = ?) and u.id_usuario != ?";
 
   try {
     const [resultAcharUsuarioPorNome] = await pool.query(
       acharUsuarioPorNomeSQL,
       [nome]
     );
+
     if (!resultAcharUsuarioPorNome[0])
       return res.status(404).send("Usuário não encontrado");
 
     const [resultAcharConexoes] = await pool.query(acharConexoesSQL, [
-      resultAcharUsuarioPorNome[0].usuario_id,
-      resultAcharUsuarioPorNome[0].usuario_id,
-      resultAcharUsuarioPorNome[0].usuario_id,
+      resultAcharUsuarioPorNome[0].id_usuario,
+      resultAcharUsuarioPorNome[0].id_usuario,
+      resultAcharUsuarioPorNome[0].id_usuario,
     ]);
 
     if (!resultAcharConexoes)
