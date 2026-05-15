@@ -14,7 +14,7 @@ function App() {
 
   return (
     <>
-      <Header tipo={"pagina-inicial"} />
+      <Header tipo={"cadastro"} />
       <LandingPage />
     </>
   );

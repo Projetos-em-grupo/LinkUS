@@ -10,23 +10,26 @@ function AmigosUsuario() {
   const { conexoesUsuario, conexoesUsuarioLoading, acharConexoesPorUsuario } =
     useConexao();
   const navigate = useNavigate();
+  const amigos = (conexoesUsuario ?? []).filter(
+    (conexao) => conexao.status === "aceito"
+  );
 
   useEffect(() => {
     if (usuario) acharConexoesPorUsuario(usuario.nome);
-  }, [usuario]);
+  }, [usuario, acharConexoesPorUsuario]);
 
   if (conexoesUsuarioLoading) return <Loading />;
 
   return (
     <div id="amigos-usuario">
+      <h2>Amigos</h2>
       <ul>
-        {conexoesUsuario.map((conexao, index) =>
-          conexao.status === "aceito" ? (
+        {amigos.map((conexao, index) => (
             <li
               key={index}
               style={{ cursor: "pointer" }}
               onClick={() => {
-                navigate("/mensagem", { state: conexao });
+                navigate("/mensagem", { state: { ...conexao, tipo: "privada" } });
               }}
             >
               <img
@@ -36,8 +39,7 @@ function AmigosUsuario() {
               />
               <p>@{conexao.nome}</p>
             </li>
-          ) : null
-        )}
+        ))}
       </ul>
     </div>
   );

@@ -11,26 +11,33 @@ function Solicitacoes() {
 
   useEffect(() => {
     if (usuario) acharConexoesPorUsuario(usuario.nome);
-  }, [usuario]);
+  }, [usuario, acharConexoesPorUsuario]);
 
   if (conexoesUsuarioLoading) return <Loading />;
-  console.log(conexoesUsuario);
+
+  const solicitacoesPendentes = (conexoesUsuario ?? []).filter(
+    (conexao) =>
+      conexao.status !== "aceito" &&
+      conexao.nome !== usuario.nome &&
+      conexao.requisicao === "remetente"
+  );
 
   return (
     <div id="solicitacoes">
       <h2>Solicitações</h2>
       <ul>
-        {conexoesUsuario.map((conexao) => {
-          console.log(conexao);
-          return conexao.status !== "aceito" &&
-            conexao.nome !== usuario.nome &&
-            conexao.requisicao === "remetente" ? (
-            <li>
+        {solicitacoesPendentes.length === 0 ? (
+          <li className="solicitacoes-vazias">
+            Nenhuma solicitacao pendente no momento.
+          </li>
+        ) : (
+          solicitacoesPendentes.map((conexao, index) => (
+            <li key={index}>
               <div>
                 <img
                   id="foto-perfil"
                   src={conexao.url_foto || "./icons/padrao.svg"}
-                  alt="Ícone de perfil do usuário"
+                  alt="Icone de perfil do usuario"
                 />
                 <p>@{conexao.nome}</p>
               </div>
@@ -55,11 +62,11 @@ function Solicitacoes() {
 
                     if (result.status !== 200)
                       console.error(
-                        "Erro ao aceitar a solicitação: " +
+                        "Erro ao aceitar a solicitacao: " +
                           (await result.text())
                       );
 
-                    acharConexoesPorUsuario(usuario.nome);
+                    acharConexoesPorUsuario(usuario.nome, { force: true });
                   }}
                 >
                   Aceitar
@@ -84,19 +91,19 @@ function Solicitacoes() {
 
                     if (result.status !== 200)
                       console.error(
-                        "Erro ao recusar a solicitação: " +
+                        "Erro ao recusar a solicitacao: " +
                           (await result.text())
                       );
 
-                    acharConexoesPorUsuario(usuario.nome);
+                    acharConexoesPorUsuario(usuario.nome, { force: true });
                   }}
                 >
                   Recusar
                 </a>
               </div>
             </li>
-          ) : null;
-        })}
+          ))
+        )}
       </ul>
     </div>
   );

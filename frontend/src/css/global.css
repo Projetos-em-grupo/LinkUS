@@ -33,7 +33,6 @@ li {
   background-color: var(--c9);
   margin: 6% auto;
   padding: 32px 60px;
-  border-radius: 8px;
   max-height: 80vh;
 }
 
@@ -76,10 +75,4 @@ li {
 
 .container {
   margin: 0px 60px;
-}
-
-#foto-perfil {
-  border-radius: 80px;
-  width: 60px;
-  height: 60px;
 }

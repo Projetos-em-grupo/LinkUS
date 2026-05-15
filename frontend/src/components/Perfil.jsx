@@ -18,12 +18,20 @@ function Perfil() {
   }, [token, navigate]);
 
   return (
-    <article aria-label="Perfil">
+    <article aria-label="Perfil" className="min-h-screen bg-linear-to-br from-neutral-50 to-neutral-100">
       <Header tipo="logado" setTermo={setTermo} />
-      <div>
-        <Sidebar />
-        <PostagensUsuario termo={termo} />
-        <ConversasRecentes />
+      <div className="w-full px-4 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-1">
+            <Sidebar />
+          </div>
+          <div className="md:col-span-1">
+            <PostagensUsuario termo={termo} />
+          </div>
+          <div className="md:col-span-1">
+            <ConversasRecentes />
+          </div>
+        </div>
       </div>
     </article>
   );

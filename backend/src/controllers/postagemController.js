@@ -22,10 +22,11 @@ function montarComentariosAninhados(comentarios) {
 
 export async function criarPostagem(req, res) {
   const post = req.body;
+
   const acharUsuarioPorNomeSQL =
-    "SELECt id_usuario from usuario where nome = ?";
-  const criarPostagemSQL =
-    "INSERT INTO postagem(tipo_conteudo, texto, url_midia, fk_autor) values (?, ?, ?, ?)";
+    "SELECT id_usuario from usuario where nome = ?";
+  const criarPostagemSQL = post.url_midia ?
+    "INSERT INTO postagem(tipo_conteudo, texto, url_midia, fk_autor) values (?, ?, ?, ?)" : "INSERT INTO postagem(texto, fk_autor) values (?, ?)";
 
   try {
     const [resultAcharUsuarioPorNome] = await pool.query(
@@ -36,10 +37,13 @@ export async function criarPostagem(req, res) {
     if (!resultAcharUsuarioPorNome[0])
       return res.status(404).send("Autor da postagem não encontrado");
 
-    const [resultCriarPostagem] = await pool.query(criarPostagemSQL, [
+    const [resultCriarPostagem] = await pool.query(criarPostagemSQL, post.url_midia ? [
       post.tipo,
       post.texto,
       post.url_midia,
+      resultAcharUsuarioPorNome[0].id_usuario,
+    ] : [
+      post.texto,
       resultAcharUsuarioPorNome[0].id_usuario,
     ]);
 
@@ -165,6 +169,34 @@ export async function acharPostagensUsuario(req, res) {
     );
 
     return res.status(200).send(resultAcharPostagens);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Erro interno do servidor");
+  }
+}
+
+export async function deletarPostagem(req, res) {
+  const deletarInteracoesPostagemSQL =
+    "DELETE FROM interacao WHERE fk_postagem = ?";
+  const deletarInteracoesComentariosSQL =
+    "DELETE FROM interacao WHERE fk_comentario IN (SELECT id_comentario FROM comentario WHERE fk_postagem = ?)";
+  const deletarComentariosSQL =
+    "DELETE FROM comentario WHERE fk_postagem = ?";
+  const deletarPostagemSQL = "DELETE FROM postagem WHERE id_postagem = ?";
+
+  try {
+    await pool.query(deletarInteracoesPostagemSQL, [req.params.id]);
+    await pool.query(deletarInteracoesComentariosSQL, [req.params.id]);
+    await pool.query(deletarComentariosSQL, [req.params.id]);
+
+    const [resultDeletarPostagem] = await pool.query(deletarPostagemSQL, [
+      req.params.id,
+    ]);
+
+    if (!resultDeletarPostagem)
+      return res.status(401).send("Erro ao tentar deletar a postagem");
+
+    return res.status(200).send("Postagem deletada com sucesso");
   } catch (error) {
     console.error(error);
     return res.status(500).send("Erro interno do servidor");

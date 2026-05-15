@@ -44,10 +44,11 @@ export function AutenticadorProvider({ children }) {
       localStorage.setItem("token", data.token);
       setToken(data.token);
       setUsuario(jwtDecode(data.token));
-      return true;
+      return { success: true, status: result.status };
     } else {
-      console.error("Erro ao logar o usuário: " + (await result.text()));
-      return false;
+      const message = await result.text();
+      console.error("Erro ao logar o usuário: " + message);
+      return { success: false, status: result.status, message };
     }
   }
 

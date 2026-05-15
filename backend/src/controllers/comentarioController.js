@@ -2,14 +2,16 @@ import pool from "../db.js";
 
 export async function criarComentarioPostagem(req, res) {
   const comentario = req.body;
+  console.log(comentario);
   const acharUsuarioPorNomeSQL =
     "SELECT id_usuario from usuario where nome = ?";
   const acharPostagemPorIdSQL =
     "SELECT id_postagem from postagem where id_postagem = ?";
   const acharComentarioPorIdSQL =
     "SELECT id_comentario from comentario where id_comentario = ?";
-  const criarComentarioPostagemSQL =
-    "INSERT INTO comentario(conteudo, fk_autor, fk_postagem, fk_comentario_pai) values(?, ?, ?, ?)";
+  const criarComentarioPostagemSQL = comentario.id_comentario ?
+    "INSERT INTO comentario(conteudo, fk_autor, fk_postagem, fk_comentario_pai) values(?, ?, ?, ?)" :
+    "INSERT INTO comentario(conteudo, fk_autor, fk_postagem) values(?, ?, ?)";
 
   try {
     const [resultAcharUsuarioPorNome] = await pool.query(
@@ -38,11 +40,18 @@ export async function criarComentarioPostagem(req, res) {
 
     const [resultCriarComentarioPostagem] = await pool.query(
       criarComentarioPostagemSQL,
+      comentario.id_comentario ?
       [
         comentario.conteudo,
         resultAcharUsuarioPorNome[0].id_usuario,
         comentario.id_postagem,
         comentario.id_comentario,
+      ]
+      :
+      [
+        comentario.conteudo,
+        resultAcharUsuarioPorNome[0].id_usuario,
+        comentario.id_postagem,
       ]
     );
 
@@ -73,6 +82,26 @@ export async function acharComentarios(req, res) {
         .send("Erro ao tentar achar os comentários da postagem");
 
     return res.status(200).send(resultAcharComentarios);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Erro interno do servidor");
+  }
+}
+
+export async function deletarComentario(req, res) {
+  const deletarInteracaoComentarioSQL = "DELETE FROM interacao where fk_comentario = ?";
+  const deletarComentarioSQL = "DELETE FROM comentario where id_comentario = ?";
+
+  try {
+    await pool.query(deletarInteracaoComentarioSQL, [req.params.id_comentario]);
+    const [resultDeletarComentario] = await pool.query(deletarComentarioSQL, [
+      req.params.id_comentario,
+    ]);
+
+    if (!resultDeletarComentario)
+      return res.status(401).send("Erro ao tentar deletar comentário");
+
+    return res.status(200).send("Comentário deletado com sucesso");
   } catch (error) {
     console.error(error);
     return res.status(500).send("Erro interno do servidor");

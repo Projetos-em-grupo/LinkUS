@@ -13,16 +13,24 @@ function PostagensOutroUsuario({ outroUsuario }) {
   const [jaCarregou, setJaCarregou] = useState(false);
   const navigate = useNavigate();
 
+  const ehAmigo = conexoesUsuario?.some(
+    (conexao) => conexao.nome === outroUsuario.nome && conexao.status === "aceito"
+  );
+  const solicitacaoEnviada = conexoesUsuario?.some(
+    (conexao) => conexao.nome === outroUsuario.nome && conexao.status === "solicitado"
+  );
+  const podeEnviarSolicitacao = !ehAmigo && !solicitacaoEnviada;
+
   useEffect(() => {
     if (usuario) acharConexoesPorUsuario(usuario.nome);
-  }, [usuario]);
+  }, [usuario, acharConexoesPorUsuario]);
 
   useEffect(() => {
     if (outroUsuario.nome && !jaCarregou) {
       acharPostagensPorUsuario(outroUsuario.nome);
       setJaCarregou(true);
     }
-  }, [outroUsuario]);
+  }, [outroUsuario, jaCarregou, acharPostagensPorUsuario]);
 
   async function enviarSolicitacao(destinatario) {
     const data = {};
@@ -44,7 +52,7 @@ function PostagensOutroUsuario({ outroUsuario }) {
 
       if (result.status != 200)
         console.error("Erro ao mandar a solicitação: " + (await result.text()));
-      else acharConexoesPorUsuario(usuario.nome);
+      else acharConexoesPorUsuario(usuario.nome, { force: true });
     } catch (error) {
       console.error(error);
     }
@@ -141,79 +149,101 @@ function PostagensOutroUsuario({ outroUsuario }) {
   }
 
   return (
-    <div id="postagens">
-      <div id="perfil-info">
-        <div>
-          <img
-            id="foto-perfil"
-            src={
-              outroUsuario?.url_foto
-                ? outroUsuario.url_foto
-                : "./icons/padrao.svg"
-            }
-            alt="Foto de perfil do usuário"
-          />
-          <p>@{outroUsuario?.nome}</p>
+    <div
+      id="postagens"
+      className="mt-6 flex h-full min-h-0 flex-col space-y-6 overflow-y-auto overscroll-contain pr-2"
+    >
+      <section className="bg-white rounded-[28px] border border-neutral-200 shadow-sm p-6">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4 min-w-0">
+            <img
+              id="foto-perfil"
+              src={outroUsuario?.url_foto || "./icons/padrao.svg"}
+              alt="Foto de perfil do usuário"
+              className="w-20 h-20 rounded-full object-cover border-2 border-neutral-200 shadow-sm"
+            />
+            <div className="min-w-0">
+              <p className="font-poppins font-semibold text-2xl text-neutral-900 truncate">
+                @{outroUsuario?.nome}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-neutral-500">
+                {outroUsuario?.descricao || "Perfil público do usuário"}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 justify-start md:justify-end">
+            {ehAmigo && (
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/mensagem", { state: { ...outroUsuario, tipo: "privada" } });
+                }}
+                className="rounded-full bg-cyan-500 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-600"
+              >
+                Enviar mensagem
+              </button>
+            )}
+            {solicitacaoEnviada && (
+              <span className="rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm font-medium text-neutral-600">
+                Solicitação enviada
+              </span>
+            )}
+            {podeEnviarSolicitacao && (
+              <button
+                type="button"
+                onClick={() => {
+                  enviarSolicitacao(outroUsuario.nome);
+                }}
+                className="cursor-pointer rounded-full border border-cyan-500 bg-white px-5 py-2 text-sm font-semibold text-cyan-600 shadow-sm transition hover:bg-cyan-50"
+              >
+                Enviar solicitação
+              </button>
+            )}
+          </div>
         </div>
-        {conexoesUsuario &&
-          conexoesUsuario.some(
-            (conexao) =>
-              conexao.nome === outroUsuario.nome && conexao.status === "aceito"
-          ) && (
-            <a
-              onClick={() => {
-                navigate("/mensagem", { state: outroUsuario });
-              }}
-            >
-              Enviar mensagem
-            </a>
-          )}
-        {conexoesUsuario &&
-          conexoesUsuario.some(
-            (conexao) =>
-              conexao.nome === outroUsuario.nome &&
-              conexao.status === "solicitado"
-          ) && <a className="inative">Solicitação enviada</a>}
-        {!conexoesUsuario ||
-          (!conexoesUsuario.some(
-            (conexao) => conexao.nome === outroUsuario.nome
-          ) && (
-            <a
-              onClick={() => {
-                enviarSolicitacao(outroUsuario.nome);
-              }}
-            >
-              Enviar solicitação
-            </a>
-          ))}
-      </div>
-      {outroUsuario?.interesses && (
-        <ul id="interesses">
-          {outroUsuario.interesses.map((interesse) => (
-            <li key={interesse}>
-              <img src="./icons/hashtag.svg" alt="Ícone de hashtag" />
-              <p>{interesse}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-      <ul>
-        {postagensUsuario &&
-          postagensUsuario.map((postagem) => (
+
+        {outroUsuario?.interesses && (
+          <div className="mt-6 flex flex-wrap gap-2">
+            {outroUsuario.interesses.map((interesse) => (
+              <span
+                key={interesse}
+                className="inline-flex items-center gap-3 rounded-[18px] border border-cyan-100 bg-linear-to-r from-cyan-50 via-white to-sky-50 px-3 py-2.5 text-slate-700 shadow-[0_12px_24px_-20px_rgba(6,182,212,0.9)] ring-1 ring-white transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-[0_18px_30px_-22px_rgba(14,116,144,0.65)]"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 shadow-sm">
+                  <img
+                    src="./icons/hashtag.svg"
+                    alt="Icone de hashtag"
+                    className="h-4 w-4 brightness-0 invert"
+                  />
+                </span>
+                <span className="font-poppins text-sm font-semibold tracking-[0.01em]">
+                  {interesse}
+                </span>
+              </span>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {postagensUsuario && postagensUsuario.length > 0 ? (
+        <ul className="space-y-4">
+          {postagensUsuario.map((postagem) => (
             <li
               key={postagem.id_postagem}
-              className="conteudo"
-              id="conteudo-post"
+              className="rounded-[28px] border border-neutral-200 bg-white p-6 shadow-sm transition hover:shadow-lg"
             >
-              <div id="post">
+              <div className="flex items-center gap-4">
                 <img
-                  id="foto-perfil"
                   src={postagem.url_foto || "./icons/padrao.svg"}
                   alt={`Foto do usuário ${postagem.nome}`}
+                  className="w-12 h-12 rounded-full object-cover border border-neutral-200"
                 />
-                <div id="info">
-                  <h2>{postagem.nome}</h2>
-                  <p>
+                <div className="min-w-0">
+                  <h2 className="font-poppins font-semibold text-base text-neutral-900 truncate">
+                    {postagem.nome}
+                  </h2>
+                  <p className="text-xs text-neutral-500">
                     {formatDistanceToNow(new Date(postagem.data_criacao), {
                       addSuffix: true,
                       locale: ptBR,
@@ -222,33 +252,34 @@ function PostagensOutroUsuario({ outroUsuario }) {
                 </div>
               </div>
 
-              <p>{postagem.texto}</p>
+              <p className="mt-4 text-neutral-700 leading-relaxed whitespace-pre-line">
+                {postagem.texto}
+              </p>
 
               {postagem.tipo_conteudo === "imagem" && (
                 <img
                   src={postagem.url_midia}
-                  id="imagem-post"
                   alt="Imagem da postagem"
+                  className="mt-4 max-w-full max-h-112 rounded-3xl border border-neutral-200 object-contain"
                 />
               )}
 
               {postagem.tipo_conteudo === "video" && (
-                <video controls width="500" id="video-post">
-                  <source src={postagem.url_midia} type="video/mp4" />
-                </video>
+                <div className="mt-4 overflow-hidden rounded-3xl border border-neutral-200">
+                  <video controls className="w-full h-auto">
+                    <source src={postagem.url_midia} type="video/mp4" />
+                  </video>
+                </div>
               )}
 
-              <ul
-                style={{
-                  justifyContent: "start",
-                  gap: "40px",
-                  marginTop: "8px",
-                }}
-              >
-                <li>
+              <div className="mt-4 flex flex-wrap items-center gap-5 text-sm text-neutral-600">
+                <button
+                  type="button"
+                  onClick={() => interagirPostagem(postagem, "like")}
+                  className="cursor-pointer inline-flex items-center gap-2 transition hover:text-cyan-600"
+                >
                   <img
-                    onClick={() => interagirPostagem(postagem, "like")}
-                    className="interacao"
+                    className="w-5 h-5"
                     src={
                       postagem.interacao === "like"
                         ? "./icons/like-dado.svg"
@@ -256,12 +287,18 @@ function PostagensOutroUsuario({ outroUsuario }) {
                     }
                     alt="Ícone de like"
                   />
-                  <p>{postagem.positivas}</p>
-                </li>
-                <li>
+                  <span className={postagem.interacao === "like" ? "text-cyan-600 font-semibold" : ""}>
+                    {postagem.positivas}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => interagirPostagem(postagem, "dislike")}
+                  className="cursor-pointer inline-flex items-center gap-2 transition hover:text-rose-600"
+                >
                   <img
-                    onClick={() => interagirPostagem(postagem, "dislike")}
-                    className="interacao"
+                    className="w-5 h-5"
                     src={
                       postagem.interacao === "dislike"
                         ? "./icons/dislike-dado.svg"
@@ -269,12 +306,19 @@ function PostagensOutroUsuario({ outroUsuario }) {
                     }
                     alt="Ícone de dislike"
                   />
-                  <p>{postagem.negativas}</p>
-                </li>
-              </ul>
+                  <span className={postagem.interacao === "dislike" ? "text-rose-600 font-semibold" : ""}>
+                    {postagem.negativas}
+                  </span>
+                </button>
+              </div>
             </li>
           ))}
-      </ul>
+        </ul>
+      ) : (
+        <div className="rounded-[28px] border border-neutral-200 bg-white p-8 text-center text-neutral-500 shadow-sm">
+          Nenhuma postagem encontrada.
+        </div>
+      )}
     </div>
   );
 }

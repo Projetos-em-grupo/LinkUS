@@ -10,6 +10,11 @@ import postagensRoutes from "./routes/postagensRoutes.js";
 import comentariosRoutes from "./routes/comentariosRoutes.js";
 import interacoesRoutes from "./routes/interacoesRoutes.js";
 import { verificarToken } from "./middlewareAutenticador.js";
+import {
+  bloquearClientesExternos,
+  createCorsOptions,
+  criarLimitadorDeRequisicoes,
+} from "./securityMiddleware.js";
 
 dotenv.config();
 
@@ -26,8 +31,12 @@ const PORT = process.env.PORT || 8080;
 
 const app = express();
 
-app.use(cors());
+app.set("trust proxy", true);
+
+app.use(cors(createCorsOptions()));
 app.use(express.json());
+app.use(criarLimitadorDeRequisicoes());
+app.use(bloquearClientesExternos);
 
 app.use("/usuario", usuariosRoutes);
 app.use("/usuarioInteresse", verificarToken, usuariosInteressesRoutes);
@@ -39,6 +48,7 @@ app.use("/comentario", comentariosRoutes);
 app.use("/interacao", interacoesRoutes);
 
 app.get("/", (req, res) => res.send("Servidor rodando"));
+app.get("/health", (req, res) => res.status(200).send("ok"));
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta: ${PORT}`);

@@ -49,7 +49,7 @@ export async function logarUsuario(req, res) {
   const email = req.body.email;
   const senha = req.body.senha;
   const logarSQL =
-    "SELECT u.id_usuario, u.nome, u.email, u.senha, u.url_foto, u.data_nascimento, COALESCE(JSON_AGG(i.nome) FILTER (WHERE i.nome IS NOT NULL), '[]'::json) AS interesses from usuario u left join usuario_interesse ui on ui.fk_usuario = u.id_usuario left join interesse i on ui.fk_interesse = i.id_interesse where email = ? group by u.id_usuario, u.nome, u.email, u.senha, u.url_foto, u.data_nascimento";
+    "SELECT u.id_usuario, u.nome, u.email, u.senha, u.url_foto, u.funcao, u.data_nascimento, COALESCE(JSON_AGG(i.nome) FILTER (WHERE i.nome IS NOT NULL), '[]'::json) AS interesses from usuario u left join usuario_interesse ui on ui.fk_usuario = u.id_usuario left join interesse i on ui.fk_interesse = i.id_interesse where email = ? group by u.id_usuario, u.nome, u.email, u.senha, u.url_foto, u.funcao, u.data_nascimento";
 
   try {
     const [result] = await pool.query(logarSQL, [email]);
@@ -117,7 +117,7 @@ export async function atualizarUsuario(req, res) {
   const apagarUsuarioInteressesSQL =
     "DELETE from usuario_interesse where fk_usuario = ?";
   const interesseJaExisteSQL =
-    "SELECT id_interesse from interesse where id_interesse = ?";
+    "SELECT id_interesse from interesse where nome = ?";
   const acharNovoInteresseSQL =
     "SELECT id_interesse from interesse where nome = ?";
   const criarInteresseSQL = "INSERT into interesse(nome) values(?)";

@@ -1,29 +1,53 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { UsuariosContext } from "./useUsuarios";
 
 export function UsuariosProvider({ children }) {
   const [usuariosLoading, setUsuariosLoading] = useState(true);
   const [usuariosTrigger, setUsuariosTrigger] = useState(true);
   const [usuarios, setUsuarios] = useState(null);
+  const usuariosCacheRef = useRef(null);
 
   useEffect(() => {
-    async function acharUsuarios() {
-      try {
-        const res = await fetch("https://link-us-virid.vercel.app/_/backend/usuario/acharUsuarios", {
-          method: "GET",
-        });
+    const controller = new AbortController();
 
-        if (res.status !== 200)
-          console.log("Erro de requisição: " + (await res.text()));
-        else setUsuarios(await res.json());
+    async function acharUsuarios() {
+      if (usuariosCacheRef.current && usuariosTrigger !== true) {
+        setUsuarios(usuariosCacheRef.current);
+        setUsuariosLoading(false);
+        return;
+      }
+
+      setUsuariosLoading(true);
+
+      try {
+        const res = await fetch(
+          "https://link-us-virid.vercel.app/_/backend/usuario/acharUsuarios",
+          {
+            method: "GET",
+            signal: controller.signal,
+          }
+        );
+
+        if (res.status !== 200) {
+          console.log("Erro de requisicao: " + (await res.text()));
+          return;
+        }
+
+        const json = await res.json();
+        usuariosCacheRef.current = json;
+        setUsuarios(json);
       } catch (error) {
-        console.error("Erro ao carregar os usuários" + error);
+        if (error.name !== "AbortError") {
+          console.error("Erro ao carregar os usuarios" + error);
+        }
       } finally {
         setUsuariosLoading(false);
       }
     }
 
     acharUsuarios();
+
+    return () => controller.abort();
   }, [usuariosTrigger]);
 
   return (
