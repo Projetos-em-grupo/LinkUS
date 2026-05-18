@@ -39,7 +39,7 @@ function Header({ tipo, setTermo }) {
       <div className="mx-4 flex-1 md:mx-12">
         <label
           htmlFor="search"
-          className="group relative flex h-14 items-center overflow-hidden rounded-[24px] border border-neutral-200/90 bg-linear-to-r from-white via-slate-50 to-cyan-50/70 shadow-[0_14px_30px_-24px_rgba(15,23,42,0.45)] ring-1 ring-white transition-all duration-200 hover:border-cyan-200 focus-within:-translate-y-0.5 focus-within:border-cyan-300 focus-within:shadow-[0_20px_38px_-28px_rgba(6,182,212,0.5)] focus-within:ring-2 focus-within:ring-cyan-300/50"
+          className="group relative flex h-14 items-center overflow-hidden rounded-3xl border border-neutral-200/90 bg-linear-to-r from-white via-slate-50 to-cyan-50/70 shadow-[0_14px_30px_-24px_rgba(15,23,42,0.45)] ring-1 ring-white transition-all duration-200 hover:border-cyan-200 focus-within:-translate-y-0.5 focus-within:border-cyan-300 focus-within:shadow-[0_20px_38px_-28px_rgba(6,182,212,0.5)] focus-within:ring-2 focus-within:ring-cyan-300/50"
         >
           <span className="ml-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 shadow-sm transition-colors group-focus-within:bg-cyan-500">
             <img

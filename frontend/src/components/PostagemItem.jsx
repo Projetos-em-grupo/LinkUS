@@ -393,12 +393,12 @@ function PostagemItem({
         <img
           src={postagem.url_midia}
           alt="Post imagem"
-          className="mb-4 max-h-96 max-w-full rounded-lg object-contain"
+          className="mx-auto mb-4 max-h-96 max-w-full rounded-lg object-contain"
         />
       )}
 
       {postagem.tipo_conteudo === "video" && (
-        <video controls width="500" className="mb-4 w-full max-w-2xl rounded-lg">
+        <video controls width="500" className="mx-auto mb-4 w-full max-w-2xl rounded-lg">
           <source src={postagem.url_midia} type="video/mp4" />
         </video>
       )}
@@ -440,7 +440,7 @@ function PostagemItem({
               onChange={(e) => setTextoComentario(e.target.value)}
               placeholder="comente algo"
               rows="1"
-              className="h-8 self-center flex-1 resize-none overflow-hidden bg-transparent px-2 py-2.5 text-sm leading-5 font-poppins text-slate-700 placeholder:text-neutral-400 focus:outline-none"
+              className="h-8 self-center flex-1 resize-none overflow-hidden bg-transparent px-2 py-1 text-sm leading-5 font-poppins text-slate-700 placeholder:text-neutral-400 focus:outline-none"
             />
             <button
               type="button"
